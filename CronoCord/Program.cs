@@ -15,88 +15,61 @@ using Discord.WebSocket;
 using Discord;
 using System.Threading;
 using System.Collections;
+using Microsoft.Extensions.DependencyInjection;
+using CronoCord.Services;
+using Discord.Commands;
+using Discord.Interactions;
+using System.Reflection;
+using System.Globalization;
 
 namespace CronoCord
 {
     internal class Program
     {
         private static DiscordSocketClient _client;
+        private static IServiceProvider _serviceProvider;
 
-        public static async Task Main(string[] args)
+
+        static IServiceProvider CreateProvider()
         {
             // Config used by DiscordSocketClient
             // Define intents for the client
             var config = new DiscordSocketConfig
             {
-                GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.MessageContent
+                GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.GuildMembers,
+                AlwaysDownloadUsers = true,
             };
 
-            _client = new DiscordSocketClient(config);
+            ServiceCollection collection = new ServiceCollection();
+            collection.AddSingleton(config);
+            collection.AddSingleton<DiscordSocketClient>(); // Depends on config
+            collection.AddSingleton<CommandService>();
+            collection.AddSingleton<LoggingService>();      // Depends on DiscordSocketClient and CommandService
+            collection.AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()));
+            collection.AddScoped<InteractionHandler>();     // Depends on DiscordSocketClient, InteractionService, and IServiceProvider
 
-            // Subscribing to client events, so that we may receive them whenever they're invoked.
-            _client.Log += LogAsync;
-            _client.Ready += ReadyAsync;
-            _client.MessageReceived += MessageReceivedAsync;
-            _client.InteractionCreated += InteractionCreatedAsync;
+            // Build and return the service provider
+            return collection.BuildServiceProvider();
+        }
 
+        public static async Task Main(string[] args)
+        {
+            _serviceProvider = CreateProvider();
+
+            _client = _serviceProvider.GetService<DiscordSocketClient>();
+
+            // Here we can initialize the service that will register and execute our commands
+            await _serviceProvider.GetRequiredService<InteractionHandler>()
+                .InitializeAsync();
+
+            // Log in witt bot token
+            // Token is stored in (on windows) System Properties -> Environment Variables -> User variables
+            // Make sure to restart visual studio after adding a new user variable
             await _client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("CRONOCORD_BOT_TOKEN"));
 
             // Start bot and block the program until it is closed.
             await _client.StartAsync();
             await Task.Delay(Timeout.Infinite);
-        }
-
-        private static Task LogAsync(LogMessage log)
-        {
-            Console.WriteLine(log.ToString());
-            return Task.CompletedTask;
-        }
-
-        // The Ready event indicates that the client has opened a
-        // connection and it is now safe to access the cache.
-        private static Task ReadyAsync()
-        {
-            Console.WriteLine($"{_client.CurrentUser} is connected!");
-
-            return Task.CompletedTask;
-        }
-
-        // This is not the recommended way to write a bot - consider
-        // reading over the Commands Framework sample.
-        private static async Task MessageReceivedAsync(SocketMessage message)
-        {
-            // The bot should never respond to itself.
-            if (message.Author.Id == _client.CurrentUser.Id)
-                return;
-
-
-            if (message.Content == "!ping")
-            {
-                // Create a new ComponentBuilder, in which dropdowns & buttons can be created.
-                var cb = new ComponentBuilder()
-                    .WithButton("Click me!", "unique-id", ButtonStyle.Primary);
-
-                // Send a message with content 'pong', including a button.
-                // This button needs to be build by calling .Build() before being passed into the call.
-                await message.Channel.SendMessageAsync("pong!", components: cb.Build());
-            }
-        }
-
-        // For better functionality & a more developer-friendly approach to handling any kind of interaction, refer to:
-        // https://discordnet.dev/guides/int_framework/intro.html
-        private static async Task InteractionCreatedAsync(SocketInteraction interaction)
-        {
-            // safety-casting is the best way to prevent something being cast from being null.
-            // If this check does not pass, it could not be cast to said type.
-            if (interaction is SocketMessageComponent component)
-            {
-                // Check for the ID created in the button mentioned above.
-                if (component.Data.CustomId == "unique-id")
-                    await interaction.RespondAsync("Thank you for clicking my button!");
-
-                else
-                    Console.WriteLine("An ID has been received that has no handler!");
-            }
         }
     }
 }
