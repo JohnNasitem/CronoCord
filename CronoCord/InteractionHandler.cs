@@ -32,29 +32,27 @@ namespace CronoCord
         {
             // Process when the client is ready, so we can register our commands.
             _client.Ready += ReadyAsync;
-            _handler.Log += LogAsync;
-
             // Add the public modules that inherit InteractionModuleBase<T> to the InteractionService
             await _handler.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
-
             // Process the InteractionCreated payloads to execute Interactions commands
             _client.InteractionCreated += HandleInteraction;
-
             // Also process the result of the command execution.
             _handler.InteractionExecuted += HandleInteractionExecute;
-        }
-
-        private Task LogAsync(LogMessage log)
-        {
-            Console.WriteLine(log);
-            return Task.CompletedTask;
         }
 
         private async Task ReadyAsync()
         {
             // Register the commands globally.
             // alternatively you can use _handler.RegisterCommandsGloballyAsync() to register commands to a specific guild.
-            await _handler.RegisterCommandsGloballyAsync();
+            try
+            {
+                await _handler.RegisterCommandsGloballyAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error registering commands globally: {ex.Message}");
+                Console.WriteLine(ex.StackTrace);
+            }
 
             Console.WriteLine($"{_client.CurrentUser} is connected!");
         }
