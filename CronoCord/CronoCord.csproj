@@ -127,7 +127,7 @@
     <Compile Include="Services\LoggingService.cs" />
     <Compile Include="Modules\UtilityModule.cs" />
     <Compile Include="Utilities\DatabaseManagement.cs" />
-    <Compile Include="Utilities\Utilities.cs" />
+    <Compile Include="Utilities\UtilityMethods.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

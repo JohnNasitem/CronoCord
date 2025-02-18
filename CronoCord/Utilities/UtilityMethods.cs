@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace CronoCord
 {
-    public static class Utilities
+    public static class UtilityMethods
     {
         /// <summary>
         /// Matches time of day, eg 3am, 4:00 pm, 22:40.<br/>
