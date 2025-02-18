@@ -193,14 +193,8 @@ namespace CronoCord.Utilities
         /// <summary>
         /// Create a new entry in the events table
         /// </summary>
-        /// <param name="creatorId">ID of the user who created the event</param>
-        /// <param name="name">Event name</param>
-        /// <param name="description">Event description</param>
-        /// <param name="startTimeUnix">Event start time as unix timestamp</param>
-        /// <param name="endTimeUnix">Event end time as unix timestamp</param>
-        /// <param name="channelId">Channel ID to announce in</param>
-        /// <param name="messageId">Message ID to reply to (original message)</param>
-        public static void CreateEvent(long creatorId, string name, string description, long startTimeUnix, long endTimeUnix, long channelId, long messageId)
+        /// <param name="event">Event ot add to events table</param>
+        public static void CreateEvent(Event eventToAdd)
         {
             try
             {
@@ -210,17 +204,17 @@ namespace CronoCord.Utilities
                                           "VALUES (@CreatorID, @Name, @Description, @StartTimeUnix, @EndTimeUnix, @Status, @ChannelID, @MessageID @AlreadyRemindedOwner, @AlreadyRemindedParticipants, @AlreadyAnnounced);";
 
                     // Add parameters
-                    command.Parameters.AddWithValue("@CreatorID", creatorId);
-                    command.Parameters.AddWithValue("@Name", name);
-                    command.Parameters.AddWithValue("@Description", description);
-                    command.Parameters.AddWithValue("@StartTimeUnix", startTimeUnix);
-                    command.Parameters.AddWithValue("@EndTimeUnix", endTimeUnix);
-                    command.Parameters.AddWithValue("@Status", Enum.GetName(typeof(Event.EventsStatuses), Event.EventsStatuses.PendingConfirmation));
-                    command.Parameters.AddWithValue("@ChannelID", channelId);
-                    command.Parameters.AddWithValue("@MessageID", messageId);
-                    command.Parameters.AddWithValue("@AlreadyRemindedOwner", 0);
-                    command.Parameters.AddWithValue("@AlreadyRemindedParticipants", 0);
-                    command.Parameters.AddWithValue("@AlreadyAnnounced", 0);
+                    command.Parameters.AddWithValue("@CreatorID", eventToAdd.CreatorID);
+                    command.Parameters.AddWithValue("@Name", eventToAdd.Name);
+                    command.Parameters.AddWithValue("@Description", eventToAdd.Description);
+                    command.Parameters.AddWithValue("@StartTimeUnix", eventToAdd.StartTimeUnix);
+                    command.Parameters.AddWithValue("@EndTimeUnix", eventToAdd.EndTimeUnix);
+                    command.Parameters.AddWithValue("@Status", eventToAdd.Status);
+                    command.Parameters.AddWithValue("@ChannelID", eventToAdd.ChannelID);
+                    command.Parameters.AddWithValue("@MessageID", eventToAdd.MessageID);
+                    command.Parameters.AddWithValue("@AlreadyRemindedOwner", eventToAdd.AlreadyRemindedOwner);
+                    command.Parameters.AddWithValue("@AlreadyRemindedParticipants", eventToAdd.AlreadyRemindedParticipants);
+                    command.Parameters.AddWithValue("@AlreadyAnnounced", eventToAdd.AlreadyAnnounced);
 
                     // Execute the query
                     command.ExecuteNonQuery();
