@@ -6,6 +6,7 @@
 //Author: John Nasitem
 //***********************************************************************************
 
+using CronoCord.Modules;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
@@ -32,12 +33,24 @@ namespace CronoCord
         {
             // Process when the client is ready, so we can register our commands.
             _client.Ready += ReadyAsync;
+            // Process modal submissions
+            _client.ModalSubmitted += ModalSubmitted;
             // Add the public modules that inherit InteractionModuleBase<T> to the InteractionService
             await _handler.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
             // Process the InteractionCreated payloads to execute Interactions commands
             _client.InteractionCreated += HandleInteraction;
             // Also process the result of the command execution.
             _handler.InteractionExecuted += HandleInteractionExecute;
+        }
+
+        private async Task ModalSubmitted(SocketModal modal)
+        {
+            switch (modal.Data.CustomId)
+            {
+                case "create_event":
+                    await CreateEventModal.ModelSubmit(modal);
+                    break;
+            }
         }
 
         private async Task ReadyAsync()
