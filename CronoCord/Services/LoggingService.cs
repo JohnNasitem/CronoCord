@@ -14,10 +14,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 
 namespace CronoCord.Services
-{
-    /// <summary>
-    /// Logging service
-    /// </summary>
+{\
     public class LoggingService
     {
         public LoggingService(DiscordSocketClient client, CommandService command)
