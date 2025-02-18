@@ -1,4 +1,13 @@
-﻿using System;
+﻿//***********************************************************************************
+//Program: EventsModule.cs
+//Description: Holds Events commands
+//Date: Feb 18, 2025
+//Author: John Nasitem
+//***********************************************************************************
+
+
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
