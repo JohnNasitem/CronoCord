@@ -119,6 +119,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\Event.cs" />
     <Compile Include="InteractionHandler.cs" />
     <Compile Include="Interactions\Modals\CreateEventModal.cs" />
     <Compile Include="Modules\EventsModule.cs" />
