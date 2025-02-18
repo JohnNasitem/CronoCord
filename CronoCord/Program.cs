@@ -28,7 +28,8 @@ namespace CronoCord
     {
         private static DiscordSocketClient _client;
         private static IServiceProvider _serviceProvider;
-
+        public static string Version { get; } = "1.0.0";
+        public static string Author { get; } = "Eatdatpizza";
 
         static IServiceProvider CreateProvider()
         {
