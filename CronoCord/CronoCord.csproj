@@ -111,7 +111,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\LoggingService.cs" />
-    <Compile Include="SlashCommands\EchoCommand.cs" />
+    <Compile Include="Modules\UtilityModule.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
