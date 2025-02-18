@@ -6,21 +6,16 @@
 //***********************************************************************************
 
 
+
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Discord.WebSocket;
 using Discord;
 using System.Threading;
-using System.Collections;
 using Microsoft.Extensions.DependencyInjection;
 using CronoCord.Services;
 using Discord.Commands;
 using Discord.Interactions;
-using System.Reflection;
-using System.Globalization;
 
 namespace CronoCord
 {
