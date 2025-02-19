@@ -48,7 +48,7 @@ namespace CronoCord
             switch (modal.Data.CustomId)
             {
                 case "create_event":
-                    await CreateEventModal.ModelSubmit(modal);
+                    await Interactions.Modals.CreateEventModal.ModelSubmit(modal);
                     break;
             }
         }
