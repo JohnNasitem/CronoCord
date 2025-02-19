@@ -149,20 +149,33 @@ namespace CronoCord
         /// Get the epoch unix timestamp for the start of the latest sunday
         /// </summary>
         /// <returns>epoch unix timestamp</returns>
-        public static long GetSundayUnixTimeStamp(bool previousSunday)
+        public static long GetSundayUnixTimeStamp(bool previousSunday, DateTime startTime = default)
         {
-            DateTime now = DateTime.Now;
+            if (startTime == default)
+                startTime = DateTime.Now;
 
             // Calculate how many days to go back or forward to reach Sunday
             // DayOfWeek.Sunday == 0
             int daysToAdd = previousSunday
-                            ? (now.DayOfWeek == 0 ? -7 : -(int)now.DayOfWeek)
-                            : (7 - (int)now.DayOfWeek);
+                            ? (startTime.DayOfWeek == 0 ? -7 : -(int)startTime.DayOfWeek)
+                            : (7 - (int)startTime.DayOfWeek);
 
 
-            DateTime sunday = now.AddDays(daysToAdd);
+            DateTime sunday = startTime.AddDays(daysToAdd);
 
             return new DateTimeOffset(sunday.Date).ToUnixTimeSeconds();
+        }
+
+
+
+        /// <summary>
+        /// Convert unix time stamp into date time
+        /// </summary>
+        /// <param name="unixTimeStamp">date in unix time stamp</param>
+        /// <returns>Converted DateTime instance</returns>
+        public static DateTime ToDateTime(long unixTimeStamp)
+        {
+            return DateTimeOffset.FromUnixTimeSeconds(unixTimeStamp).DateTime;
         }
     }
 }
