@@ -67,50 +67,23 @@ namespace CronoCord.Modules
                 weekOffset = 0;
 
             await ViewSchedule(users, weekOffset, showOverlapCount);
-            //try
-            //{
-            //    // List of users
-            //    List<IUser> users = new List<IUser>();
-            //    // Find all users from the usersStr
-            //    foreach (Match match in Regex.Matches(usersStr, @"\d+"))
-            //    {
-            //        IUser possibleUser = Context.Client.GetUserAsync(ulong.Parse(match.Value)).Result;
-            //        if (possibleUser != null)
-            //            users.Add(possibleUser);
-            //    }
-            //    // Default to invoking user
-            //    if (usersStr == "")
-            //        users.Add(Context.User);
-            //    // Only positive week offsets
-            //    if (weekOffset < 0)
-            //        weekOffset = 0;
-            //    await ViewSchedule(users, weekOffset, showOverlapCount);
-            //}
-            //catch (Exception ex)
-            //{
-            //    Console.WriteLine($"Method: ViewScheduleCommand - Problem: {ex}");
-            //    await RespondAsync($"Something went wrong... contact <@{Program.AuthorID}>", ephemeral: true);
-            //}
-
         }
 
         private async Task ViewSchedule(List<IUser> users, int weekOffset, bool showOverlapCount)
         {
             List<Availability> unfiltered_availabilities = null;
             List<Availability> filtered_availabilities = new List<Availability>();
-
-            Console.WriteLine("ViewSchedule - 1");
+            
+            // Get availabilities
             await Task.Run(() => unfiltered_availabilities = DatabaseManagement.GetAvailabilites(users.Select(u => u.Id).ToList()));
-            Console.WriteLine("ViewSchedule - 2");
 
+            // Null means something went wrong with accessing the database
             if (unfiltered_availabilities == null)
             {
-                Console.WriteLine("ViewSchedule - 3");
                 Console.WriteLine("Method: ViewSchedule - Problem: unfiltered_availabilities was null, something happened with getting availabilities");
                 await RespondAsync($"Something went wrong... contact <@{Program.AuthorID}>", ephemeral: true);
                 return;
             }
-            Console.WriteLine("ViewSchedule - 4");
 
 
             foreach (Availability availability in unfiltered_availabilities)
@@ -132,36 +105,23 @@ namespace CronoCord.Modules
                 //}
             }
 
-            Console.WriteLine("ViewSchedule - 5");
             GenerateScheduleImage(filtered_availabilities, weekOffset, showOverlapCount);
-            Console.WriteLine("ViewSchedule - 6");
             await RespondWithFileAsync("schedule.png", text: "Here is your schedule!");
-            Console.WriteLine("ViewSchedule - 7");
-            //try
-            //{
-            //    GenerateScheduleImage(filtered_availabilities, weekOffset, showOverlapCount);
-            //    await RespondWithFileAsync("schedule.png", text: "Here is your schedule!");
-            //}
-            //catch (Exception ex)
-            //{
-            //    Console.WriteLine($"Problem: {ex}");
-            //}
         }
 
         private void GenerateScheduleImage(List<Availability> availabilities, int weekOffset, bool showOverlapCount)
         {
-            Console.WriteLine("GenerateScheduleImage - 1");
             // TODO: this breaks when availabilities is empty
             List<ulong> uniqueIDs = availabilities.Select(a => a.UserID).Distinct().ToList();
-            Console.WriteLine("GenerateScheduleImage - 2");
             Dictionary<ulong, System.Drawing.Color> userColours = GenerateUserColours(uniqueIDs);
-            Console.WriteLine("GenerateScheduleImage - 3");
+
             //Does it need to be sorted?
             availabilities.Sort((a1, a2) => a1.StartTimeUnix.CompareTo(a2.StartTimeUnix));
-            Console.WriteLine("GenerateScheduleImage - 4");
+
             int backgroundWidth = 2300;
             System.Drawing.Size imageSize = new System.Drawing.Size(uniqueIDs.Count == 0 ? backgroundWidth : backgroundWidth + 400, 2500);
-            Console.WriteLine("GenerateScheduleImage - 5");
+
+            // Create schedule bitmap
             using (Bitmap bm = new Bitmap(imageSize.Width, imageSize.Height))
             {
                 // Create a Graphics object from the bitmap
@@ -191,21 +151,6 @@ namespace CronoCord.Modules
                 }
                 bm.Save("schedule.png", System.Drawing.Imaging.ImageFormat.Png);
             }
-            //using (SKSurface surface = SKSurface.Create(imageSize))
-            //{
-            //    Console.WriteLine("GenerateScheduleImage - 6");
-            //    SKCanvas canvas = surface.Canvas;
-            //    canvas.Clear();
-            //    canvas.DrawRect(0, 0, 200, 200, userColours[uniqueIDs[0]]);
-            //    Console.WriteLine("GenerateScheduleImage - 7");
-            //    // save the file
-            //    SKData data = surface.Snapshot().Encode(SKEncodedImageFormat.Png, 100);
-            //    Console.WriteLine("GenerateScheduleImage - 8");
-            //    var stream = File.OpenWrite("schedule.png");
-            //    Console.WriteLine("GenerateScheduleImage - 9");
-            //    data.SaveTo(stream);
-            //    Console.WriteLine("GenerateScheduleImage - 10");
-            //}
         }
 
         /// <summary>
@@ -215,7 +160,6 @@ namespace CronoCord.Modules
         /// <returns>Dictionary with user id as key and color as value</returns>
         private Dictionary<ulong, System.Drawing.Color> GenerateUserColours(List<ulong> userIDs)
         {
-            Console.WriteLine("GenerateUserColours - 1");
             // Generate a "light" colour
             System.Drawing.Color GenerateColour()
             {
@@ -230,29 +174,18 @@ namespace CronoCord.Modules
                         return System.Drawing.Color.FromArgb (128, r, g, b);
                 }
             }
+
+
             Dictionary<ulong, System.Drawing.Color> userColours = new Dictionary<ulong, System.Drawing.Color>();
+
             // Generate unique colours for each user
-
-            try
+            foreach (ulong userID in userIDs)
             {
-                foreach (ulong userID in userIDs)
-                {
-                    Console.WriteLine("GenerateUserColours - 2");
-                    System.Drawing.Color possibleColour = System.Drawing.Color.Empty;
-                    do possibleColour = GenerateColour();
-                    while (userColours.ContainsValue(possibleColour));
-                    Console.WriteLine("GenerateUserColours - 3");
-                    userColours.Add(userID, possibleColour);
-                    Console.WriteLine("GenerateUserColours - 4");
-                }
+                System.Drawing.Color possibleColour = System.Drawing.Color.Empty;
+                do possibleColour = GenerateColour();
+                while (userColours.ContainsValue(possibleColour));
+                userColours.Add(userID, possibleColour);
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Gen Col Error: {ex}");
-            }
-            
-
-            Console.WriteLine("GenerateUserColours - 5");
 
             return userColours;
         }
