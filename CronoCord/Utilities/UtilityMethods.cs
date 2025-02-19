@@ -66,16 +66,31 @@ namespace CronoCord
                 return null;
 
             //Parse data
-            int.TryParse(dateTimeMatch.Groups[4].ToString(), out int year);
-            int month = AbbreviatedMonths.IndexOf(dateTimeMatch.Groups[2].ToString().ToLower()) + 1;
-            int.TryParse(dateTimeMatch.Groups[3].ToString(), out int dayOfMonth);
+            string yearString = dateTimeMatch.Groups[4].ToString();
+            string monthString = dateTimeMatch.Groups[2].ToString().ToLower();
+            string domString = dateTimeMatch.Groups[3].ToString();
+            int year = 1;
+            int month = 1;
+            int dayOfMonth = 1;
+
+            // only set year, month, and dayOfMonth if all 3 were matched
+            if (yearString.Length > 0 && monthString.Length > 0 && domString.Length > 0)
+            {
+                int.TryParse(yearString, out year);
+                month = AbbreviatedMonths.IndexOf(monthString) + 1;
+                int.TryParse(domString, out dayOfMonth);
+            }
+
+            // Dont need to check if time was matched as 0 is in the range for all 3
             int.TryParse(dateTimeMatch.Groups[6].ToString(), out int hours);
             int.TryParse(dateTimeMatch.Groups[8].ToString(), out int minutes);
             string meridiem = dateTimeMatch.Groups[9].ToString().ToLower();
 
+            // Enforce 12 hour format
             if (hours > 12)
                 return null;
 
+            // Make 12 act as 0
             if (hours == 12)
                 hours = meridiem == "am" ? 0 : 12;
             else
