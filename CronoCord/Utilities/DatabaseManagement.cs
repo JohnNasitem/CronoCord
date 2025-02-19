@@ -16,6 +16,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using CronoCord.Modules;
 using System.Data.SQLite;
+using CronoCord.Classes;
+using Discord;
 
 namespace CronoCord.Utilities
 {
@@ -206,10 +208,9 @@ namespace CronoCord.Utilities
                         command.CommandText = @"CREATE TABLE IF NOT EXISTS availabilities(
                                                 ID INTEGER PRIMARY KEY AUTOINCREMENT, 
                                                 UserID INTEGER NOT NULL,
-                                                DATE TEXT NOT NULL,
-                                                StartTime TEXT NOT NULL,
-                                                EndTime TEXT NOT NULL,
-                                                RECURRING TEXT NOT NULL
+                                                StartTimeUnix INTEGER NOT NULL,
+                                                EndTimeUnix INTEGER NOT NULL,
+                                                Recurring TEXT NOT NULL
                                                 )";
                         command.ExecuteNonQuery();
                     }
@@ -234,6 +235,39 @@ namespace CronoCord.Utilities
 
 
         #region Availabilities
+        public static bool CreateAvailability(Availability availabilityDetails)
+        {
+            try
+            {
+                using (SQLiteCommand command = _connection.CreateCommand())
+                {
+                    command.CommandText = "INSERT INTO availabilities(UserID, StartTimeUnix, EndTimeUnix, Recurring) " +
+                                          "VALUES(@UserID, @StartTimeUnix, @EndTimeUnix, @Recurring)";
+
+
+                    // Add parameters
+                    command.Parameters.AddWithValue("@UserID", availabilityDetails.UserID);
+                    command.Parameters.AddWithValue("@StartTimeUnix", availabilityDetails.StartTimeUnix);
+                    command.Parameters.AddWithValue("@EndTimeUnix", availabilityDetails.EndTimeUnix);
+                    command.Parameters.AddWithValue("@Recurring", availabilityDetails.IsRecurring);
+
+                    // Execute the query
+                    command.ExecuteNonQuery();
+                }
+
+                return true;
+            }
+            catch (SQLiteException ex)
+            {
+                Console.WriteLine($"SQLite Exception - Error Code: {(_sqliteResultCodes.ContainsKey(ex.ErrorCode) ? _sqliteResultCodes[ex.ErrorCode] : "N/A")} - Error: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Problem occured in DatabaseManagement.ResetTable: {ex.Message}");
+            }
+
+            return false;
+        }
         #endregion
 
 
