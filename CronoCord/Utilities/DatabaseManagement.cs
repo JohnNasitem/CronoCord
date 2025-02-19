@@ -235,6 +235,11 @@ namespace CronoCord.Utilities
 
 
         #region Availabilities
+        /// <summary>
+        /// Add a new entry to the availabilities table
+        /// </summary>
+        /// <param name="availabilityDetails">availability details</param>
+        /// <returns>sucess</returns>
         public static bool CreateAvailability(Availability availabilityDetails)
         {
             try
@@ -277,7 +282,7 @@ namespace CronoCord.Utilities
         /// Create a new entry in the events table
         /// </summary>
         /// <param name="event">Event ot add to events table</param>
-        public static bool CreateEvent(Classes.Event eventToAdd)
+        public static bool CreateEvent(Event eventToAdd)
         {
             try
             {
@@ -322,9 +327,9 @@ namespace CronoCord.Utilities
         /// Get all events
         /// </summary>
         /// <returns>List of events</returns>
-        public static List<Classes.Event> GetEvents()
+        public static List<Event> GetEvents()
         {
-            List<Classes.Event> events = new List<Classes.Event>();
+            List<Event> events = new List<Event>();
 
             try
             {
@@ -337,13 +342,13 @@ namespace CronoCord.Utilities
                     {
                         while (reader.Read())
                         {
-                            events.Add(new Classes.Event(
+                            events.Add(new Event(
                                 creatorId: ulong.Parse(reader["CreatorID"].ToString()),
                                 name: reader["Name"].ToString(),
                                 description: reader["Description"].ToString(),
                                 startTimeUnix: long.Parse(reader["StartTimeUnix"].ToString()),
                                 endTimeUnix: long.Parse(reader["EndTimeUnix"].ToString()),
-                                status: (Classes.Event.EventsStatuses)Enum.Parse(typeof(Classes.Event.EventsStatuses), reader["Status"].ToString()),
+                                status: (Event.EventsStatuses)Enum.Parse(typeof(Event.EventsStatuses), reader["Status"].ToString()),
                                 channelId: ulong.Parse(reader["ChannelID"].ToString()),
                                 alreadyRemindedOwner: Convert.ToBoolean(reader["AlreadyRemindedOwner"]),
                                 alreadyRemindedParticipants: Convert.ToBoolean(reader["AlreadyRemindedParticipants"]),
