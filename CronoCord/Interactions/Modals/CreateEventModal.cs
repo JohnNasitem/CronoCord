@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CronoCord.Utilities;
+using CronoCord.Classes;
 using System;
 
 namespace CronoCord.Interactions.Modals
@@ -55,17 +56,18 @@ namespace CronoCord.Interactions.Modals
                 await modal.RespondAsync(errorMessage, ephemeral: true);
                 return;
             }
+            bool success = false;
+            Event eventDetails = new Event(modal.User.Id, name, desc, new DateTimeOffset((DateTime)startDateTime).ToUnixTimeSeconds(), new DateTimeOffset((DateTime)endDateTime).ToUnixTimeSeconds(), modal.Channel.Id);
+            await Task.Run(() => success = DatabaseManagement.CreateEvent(eventDetails));
 
-            DatabaseManagement.CreateEvent(new Classes.Event(modal.User.Id, name, desc, new DateTimeOffset((DateTime)startDateTime).ToUnixTimeSeconds(), new DateTimeOffset((DateTime)endDateTime).ToUnixTimeSeconds(), modal.Channel.Id));
+            if (success)
+            {
+                await modal.RespondAsync("Event created successfully!", ephemeral: true);
+                await modal.FollowupAsync(embed: eventDetails.CreateEventEmbed());
+            }
+            else
+                await modal.RespondAsync($"Something went wrong... contact <@{Program.AuthorID}>", ephemeral: true);
 
-
-            await modal.RespondAsync(embed: new EmbedBuilder()
-                                    .WithTitle("Successfully created event!")
-                                    .WithDescription($"Name: {name}" +
-                                                     $"From {UtilityMethods.ToUnixTimeStamp((DateTime)startDateTime)} to {UtilityMethods.ToUnixTimeStamp((DateTime)endDateTime)}" +
-                                                     $"Description: {desc}")
-                                    .WithColor(Color.Green)
-                                    .Build());
         }
     }
 }

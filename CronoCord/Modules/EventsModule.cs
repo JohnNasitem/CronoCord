@@ -17,7 +17,6 @@ using System.Threading.Tasks;
 using Discord.WebSocket;
 using System.Reflection;
 using CronoCord.Utilities;
-
 namespace CronoCord.Modules
 {
     public class EventsModule : InteractionModuleBase<SocketInteractionContext>
@@ -39,7 +38,21 @@ namespace CronoCord.Modules
         [SlashCommand("view-events", "View all events")]
         public async Task ViewEvents()
         {
-            List<Classes.Event> events = DatabaseManagement.GetEvents();
+            List<Classes.Event> events = null;
+            await Task.Run(() => events = DatabaseManagement.GetEvents());
+
+            if (events == null)
+            {
+                await RespondAsync($"Something went wrong... contact <@{Program.AuthorID}>", ephemeral: true);
+                return;
+            }
+
+            if (events.Count == 0)
+            {
+                await RespondAsync("No Events");
+                return;
+            }
+
             string output = "";
 
             foreach (Classes.Event e in events)
