@@ -105,5 +105,21 @@ namespace CronoCord
 
             return $"<t:{new DateTimeOffset(dateTime).ToUnixTimeSeconds()}{format}>";
         }
+
+
+
+        /// <summary>
+        /// Converts a epoch unix timestamp type to discords unix time stamp
+        /// </summary>
+        /// <param name="epochTimeStamp">epoch unix timestamp</param>
+        /// <param name="format">optional formater</param>
+        /// <returns>discord unix time stamp</returns>
+        public static string ToUnixTimeStamp(long epochTimeStamp, string format = "")
+        {
+            if (format != "")
+                format = $":{format}";
+
+            return $"<t:{epochTimeStamp}{format}>";
+        }
     }
 }
