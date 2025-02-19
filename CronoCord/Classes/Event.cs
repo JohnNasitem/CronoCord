@@ -72,7 +72,6 @@ namespace CronoCord.Classes
             EndTimeUnix = endTimeUnix;
             Status = status;
             ChannelID = channelId;
-            MessageID = messageId;
             AlreadyRemindedOwner = alreadyRemindedOwner;
             AlreadyRemindedParticipants = alreadyRemindedParticipants;
             AlreadyAnnounced = alreadyAnnounced;
