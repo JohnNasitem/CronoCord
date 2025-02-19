@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Discord;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -50,6 +51,19 @@ namespace CronoCord.Classes
         public bool AlreadyAnnounced { get; private set; }
 
 
+
+        /// <summary>
+        /// Event statuses
+        /// </summary>
+        public enum EventsStatuses
+        {
+            PendingConfirmation,
+            Confirmed,
+            Cancelled,
+            // Not including Finished as finished events will be deleted
+        }
+
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Event"/> class.
         /// </summary>
@@ -93,15 +107,21 @@ namespace CronoCord.Classes
         {
         }
 
+
+
         /// <summary>
-        /// Event statuses
+        /// Create an embed using instance data
         /// </summary>
-        public enum EventsStatuses
+        /// <returns>Discord embed</returns>
+        public Embed CreateEventEmbed()
         {
-            PendingConfirmation,
-            Confirmed,
-            Cancelled,
-            // Not including Finished as finished events will be deleted
+            Embed embed = new EmbedBuilder()
+                    .WithTitle($"Event: {Name}")
+                    .WithDescription($"From {UtilityMethods.ToUnixTimeStamp(StartTimeUnix)} to {UtilityMethods.ToUnixTimeStamp(StartTimeUnix)}\n" +
+                                        $"Description: {Description}\n")
+                    .WithColor(Color.Green)
+                    .Build();
+            return embed;
         }
     }
 }
