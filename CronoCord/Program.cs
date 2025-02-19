@@ -25,6 +25,7 @@ namespace CronoCord
         private static IServiceProvider _serviceProvider;
         public static string Version { get; } = "1.0.0";
         public static string Author { get; } = "Eatdatpizza";
+        public static ulong AuthorID { get; } = 357657793215332357;
 
         static IServiceProvider CreateProvider()
         {
