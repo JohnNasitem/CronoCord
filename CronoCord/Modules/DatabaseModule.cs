@@ -37,14 +37,12 @@ namespace CronoCord.Modules
         [SlashCommand("reset-database", "Reset a database table")]
         public async Task ResetDatabase(DatabaseManagement.DatabaseTables table)
         {
-            if (DatabaseManagement.ResetTable(table))
-            {
+            bool success = false;
+            await Task.Run(() => success = DatabaseManagement.ResetTable(table));
+            if (success)
                 await RespondAsync($"Successfully reset database");
-            }
             else
-            {
                 await RespondAsync($"Error, Couldn't reset database");
-            }
         }
     }
 }
