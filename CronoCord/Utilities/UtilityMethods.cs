@@ -20,6 +20,10 @@ namespace CronoCord
     {
         /// <summary>
         /// Matches time of day, eg 3am, 4:00 pm, 22:40.<br/>
+        /// Group 1: Hour<br/>
+        /// Group 2: Not Used<br/>
+        /// Group 3: Minutes<br/>
+        /// Group 4: am/pm<br/>
         /// Usage $"(?i)^{<see cref="TimeOfDayRegexString"/>}$"
         /// </summary>
         public static string TimeOfDayRegexString { get; } = @"(\d{1,2})(:(\d{2}))?\s?(am|pm)";
@@ -29,7 +33,9 @@ namespace CronoCord
         /// <summary>
         /// Matches date<br/>
         /// eg Feb 18, 2025, Feb182025, Feb 18,2025.<br/>
-        /// Group 1 (the month) only matches 3 letter characters so pair with <see cref="AbbreviatedMonths"/><br/>
+        /// Group 1: Month (only matches 3 letter characters so pair with <see cref="AbbreviatedMonths"/>)<br/>
+        /// Group 2: Day of the month<br/>
+        /// Group 3: Year<br/>
         /// Usage $"(?i)^{<see cref="DateRegexString"/>}$"
         /// </summary>
         public static string DateRegexString { get; } = @"([a-z]{3})\s?(\d{1,2}),?\s?(\d{4})";
