@@ -273,6 +273,57 @@ namespace CronoCord.Utilities
 
             return false;
         }
+
+
+
+        /// <summary>
+        /// Get availabilities for speciied users
+        /// </summary>
+        /// <param name="userIDs">list of specific user ids to find, if left null it will get all users</param>
+        /// <returns>List of Availability</returns>
+        public static List<Availability> GetAvailabilites(ulong[] userIDs = null)
+        {
+            List<Availability> availabilities = new List<Availability>();
+
+            try
+            {
+                using (SQLiteCommand command = _connection.CreateCommand())
+                {
+                    // Get everyones availability if userIDs is null
+                    // else get specified availabilities
+                    if (userIDs == null)
+                        command.CommandText = "SELECT * from availabilities";
+                    else
+                        command.CommandText = $"SELECT * from availabilities where UserID in ({string.Join(",", userIDs)})";
+
+                    // Execute the query
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            availabilities.Add(new Availability(
+                                userId: ulong.Parse(reader["UserID"].ToString()),
+                                startTimeUnix: long.Parse(reader["StartTimeUnix"].ToString()),
+                                endTimeUnix: long.Parse(reader["EndTimeUnix"].ToString()),
+                                recurring: (Availability.Recurring)Enum.Parse(typeof(Availability.Recurring), reader["Recurring"].ToString())
+                            ));
+                        }
+                    }
+                }
+            }
+            catch (SQLiteException ex)
+            {
+                Console.WriteLine($"SQLite Exception - Error Code: {(_sqliteResultCodes.ContainsKey(ex.ErrorCode) ? _sqliteResultCodes[ex.ErrorCode] : "N/A")} - Error: {ex.Message}");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Problem occured in DatabaseManagement.GetEvents: {ex.Message}");
+                return null;
+            }
+
+            return availabilities;
+        }
         #endregion
 
 
