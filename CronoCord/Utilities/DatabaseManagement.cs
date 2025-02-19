@@ -180,6 +180,33 @@ namespace CronoCord.Utilities
                     Console.WriteLine("Created events table");
                 }
 
+
+                if (table == DatabaseTables.Availabilities || table == DatabaseTables.All)
+                {
+                    // Drop table
+                    using (SQLiteCommand command = _connection.CreateCommand())
+                    {
+                        command.CommandText = "DROP TABLE IF EXISTS availabilities";
+                        command.ExecuteNonQuery();
+                    }
+                    Console.WriteLine("Dropped availabilities table");
+
+                    // Create table
+                    using (SQLiteCommand command = _connection.CreateCommand())
+                    {
+                        command.CommandText = @"CREATE TABLE IF NOT EXISTS availabilities(
+                                                ID INTEGER PRIMARY KEY AUTOINCREMENT, 
+                                                UserID INTEGER NOT NULL,
+                                                DATE TEXT NOT NULL,
+                                                StartTime TEXT NOT NULL,
+                                                EndTime TEXT NOT NULL,
+                                                RECURRING TEXT NOT NULL
+                                                )";
+                        command.ExecuteNonQuery();
+                    }
+                    Console.WriteLine("Created availabilities table");
+                }
+
                 return true;
             }
             catch (SQLiteException ex)
@@ -195,6 +222,10 @@ namespace CronoCord.Utilities
         }
 
 
+
+
+        #region Availabilities
+        #endregion
 
 
 
@@ -302,7 +333,8 @@ namespace CronoCord.Utilities
         public enum DatabaseTables
         {
             All,
-            Events
+            Events,
+            Availabilities
         }
     }
 }
