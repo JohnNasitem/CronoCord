@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CronoCord.Utilities;
-using CronoCord.Converters;
 using System;
 
 namespace CronoCord.Interactions.Modals
@@ -63,7 +62,7 @@ namespace CronoCord.Interactions.Modals
             await modal.RespondAsync(embed: new EmbedBuilder()
                                     .WithTitle("Successfully created event!")
                                     .WithDescription($"Name: {name}" +
-                                                     $"From {DataConverter.ToUnixTimeStamp((DateTime)startDateTime)} to {DataConverter.ToUnixTimeStamp((DateTime)endDateTime)}" +
+                                                     $"From {UtilityMethods.ToUnixTimeStamp((DateTime)startDateTime)} to {UtilityMethods.ToUnixTimeStamp((DateTime)endDateTime)}" +
                                                      $"Description: {desc}")
                                     .WithColor(Color.Green)
                                     .Build());
