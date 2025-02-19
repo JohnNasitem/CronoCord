@@ -1,4 +1,13 @@
-﻿using System;
+﻿//***********************************************************************************
+//Program: DatabaseManagement.cs
+//Description: Methods to access the database
+//Date: Feb 18, 2025
+//Author: John Nasitem
+//***********************************************************************************
+
+
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;

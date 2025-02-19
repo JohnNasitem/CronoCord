@@ -1,4 +1,13 @@
-﻿using Discord;
+﻿//***********************************************************************************
+//Program: Event.cs
+//Description: Event details
+//Date: Feb 18, 2025
+//Author: John Nasitem
+//***********************************************************************************
+
+
+
+using Discord;
 using System;
 using System.Collections.Generic;
 using System.Linq;

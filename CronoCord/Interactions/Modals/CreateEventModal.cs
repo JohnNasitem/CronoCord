@@ -1,4 +1,13 @@
-﻿using Discord.WebSocket;
+﻿//***********************************************************************************
+//Program: CreateEventModal.cs
+//Description: Modal for creating an event
+//Date: Feb 18, 2025
+//Author: John Nasitem
+//***********************************************************************************
+
+
+
+using Discord.WebSocket;
 using Discord;
 using System.Collections.Generic;
 using System.Linq;
