@@ -32,7 +32,7 @@ namespace CronoCord.Modules
         /// </summary>
         /// <returns>Task</returns>
         [SlashCommand("ping", "Get bot latency")]
-        public async Task Ping() =>
+        public async Task PingCommand() =>
             await RespondAsync($"Pong! Latency: {Context.Client.Latency} ms");
 
 
@@ -42,7 +42,7 @@ namespace CronoCord.Modules
         /// </summary>
         /// <returns>Task</returns>
         [SlashCommand("info", "Get bot info")]
-        public async Task Info() =>
+        public async Task InfoCommand() =>
             await RespondAsync(embed: new EmbedBuilder()
                                     .WithTitle("Bot Information")
                                     .WithDescription("This is a bot that manages schedules as well a events")

@@ -29,14 +29,14 @@ namespace CronoCord.Modules
 
         [SlashCommand("create-event", "Create an event")]
         [DefaultMemberPermissionsAttribute(GuildPermission.ManageEvents)]
-        public async Task CreateEvent()
+        public async Task CreateEventCommand()
         {
             await RespondWithModalAsync(new Interactions.Modals.CreateEventModal().Build());
         }
 
 
         [SlashCommand("view-events", "View all events")]
-        public async Task ViewEvents()
+        public async Task ViewEventsCommand()
         {
             List<Classes.Event> events = null;
             await Task.Run(() => events = DatabaseManagement.GetEvents());
