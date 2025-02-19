@@ -16,6 +16,7 @@ using Discord;
 using System.Threading.Tasks;
 using Discord.WebSocket;
 using System.Reflection;
+using CronoCord.Utilities;
 
 namespace CronoCord.Modules
 {
@@ -32,6 +33,21 @@ namespace CronoCord.Modules
         public async Task CreateEvent()
         {
             await RespondWithModalAsync(new Interactions.Modals.CreateEventModal().Build());
+        }
+
+
+        [SlashCommand("view-events", "View all events")]
+        public async Task ViewEvents()
+        {
+            List<Classes.Event> events = DatabaseManagement.GetEvents();
+            string output = "";
+
+            foreach (Classes.Event e in events)
+            {
+                output += e.Name;
+            }
+
+            await RespondAsync(output);
         }
     }
 }
