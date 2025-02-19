@@ -165,7 +165,6 @@ namespace CronoCord.Utilities
                                                 EndTimeUnix INTEGER NOT NULL,
                                                 Status TEXT NOT NULL,
                                                 ChannelID INTEGER NOT NULL,
-                                                MessageID INTEGER NOT NULL,
                                                 AlreadyRemindedOwner INTEGER NOT NULL,
                                                 AlreadyRemindedParticipants INTEGER NOT NULL,
                                                 AlreadyAnnounced INTEGER NOT NULL,
@@ -194,14 +193,14 @@ namespace CronoCord.Utilities
         /// Create a new entry in the events table
         /// </summary>
         /// <param name="event">Event ot add to events table</param>
-        public static void CreateEvent(Event eventToAdd)
+        public static void CreateEvent(Classes.Event eventToAdd)
         {
             try
             {
                 using (SqliteCommand command = _connection.CreateCommand())
                 {
-                    command.CommandText = "INSERT INTO events (CreatorID, Name, Description, StartTimeUnix, EndTimeUnix, Status, ChannelID, MessageID, AlreadyRemindedOwner, AlreadyRemindedParticipants, AlreadyAnnounced) " +
-                                          "VALUES (@CreatorID, @Name, @Description, @StartTimeUnix, @EndTimeUnix, @Status, @ChannelID, @MessageID @AlreadyRemindedOwner, @AlreadyRemindedParticipants, @AlreadyAnnounced);";
+                    command.CommandText = "INSERT INTO events (CreatorID, Name, Description, StartTimeUnix, EndTimeUnix, Status, ChannelID, AlreadyRemindedOwner, AlreadyRemindedParticipants, AlreadyAnnounced) " +
+                                          "VALUES (@CreatorID, @Name, @Description, @StartTimeUnix, @EndTimeUnix, @Status, @ChannelID @AlreadyRemindedOwner, @AlreadyRemindedParticipants, @AlreadyAnnounced);";
 
                     // Add parameters
                     command.Parameters.AddWithValue("@CreatorID", eventToAdd.CreatorID);
@@ -211,7 +210,6 @@ namespace CronoCord.Utilities
                     command.Parameters.AddWithValue("@EndTimeUnix", eventToAdd.EndTimeUnix);
                     command.Parameters.AddWithValue("@Status", eventToAdd.Status);
                     command.Parameters.AddWithValue("@ChannelID", eventToAdd.ChannelID);
-                    command.Parameters.AddWithValue("@MessageID", eventToAdd.MessageID);
                     command.Parameters.AddWithValue("@AlreadyRemindedOwner", eventToAdd.AlreadyRemindedOwner);
                     command.Parameters.AddWithValue("@AlreadyRemindedParticipants", eventToAdd.AlreadyRemindedParticipants);
                     command.Parameters.AddWithValue("@AlreadyAnnounced", eventToAdd.AlreadyAnnounced);
@@ -236,9 +234,9 @@ namespace CronoCord.Utilities
         /// Get all events
         /// </summary>
         /// <returns>List of events</returns>
-        public static List<Event> GetEvents()
+        public static List<Classes.Event> GetEvents()
         {
-            List<Event> events = new List<Event>();
+            List<Classes.Event> events = new List<Classes.Event>();
 
             try
             {
@@ -251,15 +249,14 @@ namespace CronoCord.Utilities
                     {
                         while (reader.Read())
                         {
-                            events.Add(new Event(
+                            events.Add(new Classes.Event(
                                 creatorId: (ulong)reader["CreatorID"],
                                 name: reader["Name"].ToString(),
                                 description: reader["Description"].ToString(),
                                 startTimeUnix: (long)reader["StartTimeUnix"],
                                 endTimeUnix: (long)reader["EndTimeUnix"],
-                                status: (Event.EventsStatuses)Enum.Parse(typeof(Event.EventsStatuses), reader["Status"].ToString()),
+                                status: (Classes.Event.EventsStatuses)Enum.Parse(typeof(Classes.Event.EventsStatuses), reader["Status"].ToString()),
                                 channelId: (ulong)reader["ChannelID"],
-                                messageId: (ulong)reader["MessageID"],
                                 alreadyRemindedOwner: Convert.ToBoolean(reader["AlreadyRemindedOwner"]),
                                 alreadyRemindedParticipants: Convert.ToBoolean(reader["AlreadyRemindedParticipants"]),
                                 alreadyAnnounced: Convert.ToBoolean(reader["AlreadyAnnounced"])

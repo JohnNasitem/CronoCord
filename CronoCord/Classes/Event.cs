@@ -37,10 +37,6 @@ namespace CronoCord.Classes
         /// </summary>
         public ulong ChannelID { get; private set; }
         /// <summary>
-        /// ID of the original announcement message
-        /// </summary>
-        public ulong MessageID { get; private set; }
-        /// <summary>
         /// Was the owner already reminded to confirm the event
         /// </summary>
         public bool AlreadyRemindedOwner { get; private set; }
@@ -64,11 +60,10 @@ namespace CronoCord.Classes
         /// <param name="endTimeUnix">The end time of the event in Unix timestamp format (number of seconds since January 1, 1970, UTC).</param>
         /// <param name="status">The current status of the event (e.g., "Scheduled", "Completed", "Canceled").</param>
         /// <param name="channelId">The ID of the Discord channel where the event is associated with.</param>
-        /// <param name="messageId">The ID of the message related to the event, used to identify and potentially edit the message later.</param>
         /// <param name="alreadyRemindedOwner">A boolean flag indicating whether the event creator has already been reminded (true if reminded, false if not).</param>
         /// <param name="alreadyRemindedParticipants">A boolean flag indicating whether the event participants have been reminded (true if reminded, false if not).</param>
         /// <param name="alreadyAnnounced">A boolean flag indicating whether the event has already been announced (true if announced, false if not).</param>
-        public Event(ulong creatorId, string name, string description, long startTimeUnix, long endTimeUnix, EventsStatuses status, ulong channelId, ulong messageId, bool alreadyRemindedOwner, bool alreadyRemindedParticipants, bool alreadyAnnounced)
+        public Event(ulong creatorId, string name, string description, long startTimeUnix, long endTimeUnix, EventsStatuses status, ulong channelId, bool alreadyRemindedOwner, bool alreadyRemindedParticipants, bool alreadyAnnounced)
         {
             CreatorID = creatorId;
             Name = name;
@@ -94,9 +89,8 @@ namespace CronoCord.Classes
         /// <param name="startTimeUnix">The start time of the event in Unix timestamp format (number of seconds since January 1, 1970, UTC).</param>
         /// <param name="endTimeUnix">The end time of the event in Unix timestamp format (number of seconds since January 1, 1970, UTC).</param>
         /// <param name="channelId">The ID of the Discord channel where the event is associated with.</param>
-        /// <param name="messageId">The ID of the message related to the event, used to identify and potentially edit the message later.</param>
-        public Event(ulong creatorId, string name, string description, long startTimeUnix, long endTimeUnix, ulong channelId, ulong messageId)
-            : this(creatorId, name, description, startTimeUnix, endTimeUnix, EventsStatuses.PendingConfirmation, channelId, messageId, false, false, false)
+        public Event(ulong creatorId, string name, string description, long startTimeUnix, long endTimeUnix, ulong channelId)
+            : this(creatorId, name, description, startTimeUnix, endTimeUnix, EventsStatuses.PendingConfirmation, channelId, false, false, false)
         {
         }
 
