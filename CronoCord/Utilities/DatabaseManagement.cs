@@ -6,15 +6,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using CronoCord.Modules;
-using Microsoft.Data.Sqlite;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using System.Data.SQLite;
 
 namespace CronoCord.Utilities
 {
     public static class DatabaseManagement
     {
         // Connection to db
-        private static readonly SqliteConnection _connection;
+        private static readonly SQLiteConnection _connection;
         // Sqlite result codes
         private static readonly Dictionary<int, string> _sqliteResultCodes = new Dictionary<int, string>
         {
@@ -129,8 +128,15 @@ namespace CronoCord.Utilities
 
         static DatabaseManagement()
         {
-            _connection = new SqliteConnection("Data Source=mydatabase.db");
-            _connection.Open();
+            try
+            {
+                _connection = new SQLiteConnection(@"Data Source=mydatabase.db");
+                _connection.Open();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
         }
 
 
@@ -146,7 +152,7 @@ namespace CronoCord.Utilities
                 if (table == DatabaseTables.Events || table == DatabaseTables.All)
                 {
                     // Drop table
-                    using (SqliteCommand command = _connection.CreateCommand())
+                    using (SQLiteCommand command = _connection.CreateCommand())
                     {
                         command.CommandText = "DROP TABLE IF EXISTS events";
                         command.ExecuteNonQuery();
@@ -154,7 +160,7 @@ namespace CronoCord.Utilities
                     Console.WriteLine("Dropped events table");
 
                     // Create table
-                    using (SqliteCommand command = _connection.CreateCommand())
+                    using (SQLiteCommand command = _connection.CreateCommand())
                     {
                         command.CommandText = @"CREATE TABLE IF NOT EXISTS events(
                                                 ID INTEGER PRIMARY KEY AUTOINCREMENT, 
@@ -167,7 +173,7 @@ namespace CronoCord.Utilities
                                                 ChannelID INTEGER NOT NULL,
                                                 AlreadyRemindedOwner INTEGER NOT NULL,
                                                 AlreadyRemindedParticipants INTEGER NOT NULL,
-                                                AlreadyAnnounced INTEGER NOT NULL,
+                                                AlreadyAnnounced INTEGER NOT NULL
                                                 )";
                         command.ExecuteNonQuery();
                     }
@@ -176,9 +182,9 @@ namespace CronoCord.Utilities
 
                 return true;
             }
-            catch (SqliteException ex)
+            catch (SQLiteException ex)
             {
-                Console.WriteLine($"SQLite Exception - Error Code: {(_sqliteResultCodes.ContainsKey(ex.SqliteErrorCode) ? _sqliteResultCodes[ex.SqliteErrorCode] : "N/A")} - Error: {ex.Message}");
+                Console.WriteLine($"SQLite Exception - Error Code: {(_sqliteResultCodes.ContainsKey(ex.ErrorCode) ? _sqliteResultCodes[ex.ErrorCode] : "N/A")} - Error: {ex.Message}");
             }
             catch (Exception ex)
             {
@@ -197,14 +203,14 @@ namespace CronoCord.Utilities
         /// Create a new entry in the events table
         /// </summary>
         /// <param name="event">Event ot add to events table</param>
-        public static void CreateEvent(Classes.Event eventToAdd)
+        public static bool CreateEvent(Classes.Event eventToAdd)
         {
             try
             {
-                using (SqliteCommand command = _connection.CreateCommand())
+                using (SQLiteCommand command = _connection.CreateCommand())
                 {
                     command.CommandText = "INSERT INTO events (CreatorID, Name, Description, StartTimeUnix, EndTimeUnix, Status, ChannelID, AlreadyRemindedOwner, AlreadyRemindedParticipants, AlreadyAnnounced) " +
-                                          "VALUES (@CreatorID, @Name, @Description, @StartTimeUnix, @EndTimeUnix, @Status, @ChannelID @AlreadyRemindedOwner, @AlreadyRemindedParticipants, @AlreadyAnnounced);";
+                                          "VALUES (@CreatorID, @Name, @Description, @StartTimeUnix, @EndTimeUnix, @Status, @ChannelID, @AlreadyRemindedOwner, @AlreadyRemindedParticipants, @AlreadyAnnounced)";
 
                     // Add parameters
                     command.Parameters.AddWithValue("@CreatorID", eventToAdd.CreatorID);
@@ -221,15 +227,19 @@ namespace CronoCord.Utilities
                     // Execute the query
                     command.ExecuteNonQuery();
                 }
+
+                return true;
             }
-            catch (SqliteException ex)
+            catch (SQLiteException ex)
             {
-                Console.WriteLine($"SQLite Exception - Error Code: {(_sqliteResultCodes.ContainsKey(ex.SqliteErrorCode) ? _sqliteResultCodes[ex.SqliteErrorCode] : "N/A")} - Error: {ex.Message}");
+                Console.WriteLine($"SQLite Exception - Error Code: {(_sqliteResultCodes.ContainsKey(ex.ErrorCode) ? _sqliteResultCodes[ex.ErrorCode] : "N/A")} - Error: {ex.Message}");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Problem occured in DatabaseManagement.ResetTable: {ex.Message}");
+                Console.WriteLine($"Problem occured in DatabaseManagement.CreateEvent: {ex.Message}");
             }
+
+            return false;
         }
 
 
@@ -244,23 +254,23 @@ namespace CronoCord.Utilities
 
             try
             {
-                using (SqliteCommand command = _connection.CreateCommand())
+                using (SQLiteCommand command = _connection.CreateCommand())
                 {
                     command.CommandText = "SELECT * from events";
 
                     // Execute the query
-                    using (SqliteDataReader reader = command.ExecuteReader())
+                    using (SQLiteDataReader reader = command.ExecuteReader())
                     {
                         while (reader.Read())
                         {
                             events.Add(new Classes.Event(
-                                creatorId: (ulong)reader["CreatorID"],
+                                creatorId: ulong.Parse(reader["CreatorID"].ToString()),
                                 name: reader["Name"].ToString(),
                                 description: reader["Description"].ToString(),
-                                startTimeUnix: (long)reader["StartTimeUnix"],
-                                endTimeUnix: (long)reader["EndTimeUnix"],
+                                startTimeUnix: long.Parse(reader["StartTimeUnix"].ToString()),
+                                endTimeUnix: long.Parse(reader["EndTimeUnix"].ToString()),
                                 status: (Classes.Event.EventsStatuses)Enum.Parse(typeof(Classes.Event.EventsStatuses), reader["Status"].ToString()),
-                                channelId: (ulong)reader["ChannelID"],
+                                channelId: ulong.Parse(reader["ChannelID"].ToString()),
                                 alreadyRemindedOwner: Convert.ToBoolean(reader["AlreadyRemindedOwner"]),
                                 alreadyRemindedParticipants: Convert.ToBoolean(reader["AlreadyRemindedParticipants"]),
                                 alreadyAnnounced: Convert.ToBoolean(reader["AlreadyAnnounced"])
@@ -269,13 +279,15 @@ namespace CronoCord.Utilities
                     }
                 }
             }
-            catch (SqliteException ex)
+            catch (SQLiteException ex)
             {
-                Console.WriteLine($"SQLite Exception - Error Code: {(_sqliteResultCodes.ContainsKey(ex.SqliteErrorCode) ? _sqliteResultCodes[ex.SqliteErrorCode] : "N/A")} - Error: {ex.Message}");
+                Console.WriteLine($"SQLite Exception - Error Code: {(_sqliteResultCodes.ContainsKey(ex.ErrorCode) ? _sqliteResultCodes[ex.ErrorCode] : "N/A")} - Error: {ex.Message}");
+                return null;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Problem occured in DatabaseManagement.ResetTable: {ex.Message}");
+                Console.WriteLine($"Problem occured in DatabaseManagement.GetEvents: {ex.Message}");
+                return null;
             }
 
             return events;
