@@ -44,6 +44,7 @@ namespace CronoCord
             collection.AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()));
             collection.AddScoped<InteractionHandler>();     // Depends on DiscordSocketClient, InteractionService, and IServiceProvider
 
+
             // Build and return the service provider
             return collection.BuildServiceProvider();
         }
