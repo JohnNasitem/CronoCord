@@ -131,6 +131,7 @@
     <Compile Include="InteractionHandler.cs" />
     <Compile Include="Interactions\Modals\CreateAvailabilityModal.cs" />
     <Compile Include="Interactions\Modals\CreateEventModal.cs" />
+    <Compile Include="Modules\AvailabilityModule.cs" />
     <Compile Include="Modules\DatabaseModule.cs" />
     <Compile Include="Modules\EventsModule.cs" />
     <Compile Include="Program.cs" />
