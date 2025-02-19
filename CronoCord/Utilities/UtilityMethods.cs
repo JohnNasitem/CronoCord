@@ -138,5 +138,34 @@ namespace CronoCord
 
             return $"<t:{epochTimeStamp}{format}>";
         }
+
+
+
+        /// <summary>
+        /// Get the epoch unix timestamp for the latest sunday
+        /// </summary>
+        /// <returns>epoch unix timestamp</returns>
+        public static long GetSundayUnixTimeStamp(bool previousSunday)
+        {
+            DateTime now = DateTime.Now;
+
+            // Calculate how many days to go back or forward to reach Sunday
+            // DayOfWeek.Sunday == 0
+            int daysToAdd = previousSunday 
+                            ? (now.DayOfWeek == 0 ? -7 : -(int)now.DayOfWeek)
+                            : (7 - (int)now.DayOfWeek);
+
+
+            DateTime sunday = now.AddDays(daysToAdd);
+
+            // Set of start of previous sunday
+            if (previousSunday)
+                sunday = sunday.Date;
+            // Or end of upcomming sunday
+            else
+                sunday = sunday.Date.AddDays(1).AddMilliseconds(-1);
+
+            return new DateTimeOffset(now.AddDays(daysToAdd)).ToUnixTimeSeconds();
+        }
     }
 }
