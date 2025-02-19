@@ -65,7 +65,7 @@ namespace CronoCord
 
             //Parse data
             int.TryParse(dateTimeMatch.Groups[4].ToString(), out int year);
-            int month = AbbreviatedMonths.IndexOf(dateTimeMatch.Groups[2].ToString()) + 1;
+            int month = AbbreviatedMonths.IndexOf(dateTimeMatch.Groups[2].ToString().ToLower()) + 1;
             int.TryParse(dateTimeMatch.Groups[3].ToString(), out int dayOfMonth);
             int.TryParse(dateTimeMatch.Groups[6].ToString(), out int hours);
             int.TryParse(dateTimeMatch.Groups[8].ToString(), out int minutes);
@@ -87,22 +87,6 @@ namespace CronoCord
             {
                 return null;
             }
-        }
-
-
-
-        /// <summary>
-        /// Converts a DateTime type to discords unix time stamp
-        /// </summary>
-        /// <param name="dateTime">dateTime obj</param>
-        /// <param name="format">optional formater</param>
-        /// <returns>discord unix time stamp</returns>
-        public static string ConvertToUnixTimeStamp(DateTime dateTime, string format = "")
-        {
-            if (format != "")
-                format = $":{format}";
-
-            return $"<t:{new DateTimeOffset(dateTime).ToUnixTimeSeconds()}{format}>";
         }
     }
 }

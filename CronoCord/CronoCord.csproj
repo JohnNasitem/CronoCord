@@ -120,8 +120,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classes\Event.cs" />
+    <Compile Include="Converters\DataConverter.cs" />
     <Compile Include="InteractionHandler.cs" />
     <Compile Include="Interactions\Modals\CreateEventModal.cs" />
+    <Compile Include="Modules\DatabaseModule.cs" />
     <Compile Include="Modules\EventsModule.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -134,5 +136,6 @@
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
