@@ -139,7 +139,7 @@ namespace CronoCord.Utilities
         /// Reset database tables
         /// </summary>
         /// <param name="table">Table to reset</param>
-        public static void ResetTable(DatabaseTables table)
+        public static bool ResetTable(DatabaseTables table)
         {
             try
             {
@@ -173,6 +173,8 @@ namespace CronoCord.Utilities
                     }
                     Console.WriteLine("Created events table");
                 }
+
+                return true;
             }
             catch (SqliteException ex)
             {
@@ -182,6 +184,8 @@ namespace CronoCord.Utilities
             {
                 Console.WriteLine($"Problem occured in DatabaseManagement.ResetTable: {ex.Message}");
             }
+
+            return false;
         }
 
 
