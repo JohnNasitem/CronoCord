@@ -52,6 +52,9 @@ namespace CronoCord
                 case "create_event":
                     await Interactions.Modals.CreateEventModal.ModelSubmit(modal);
                     break;
+                case "create_availability":
+                    await Interactions.Modals.CreateAvailabilityModal.ModelSubmit(modal);
+                    break;
             }
         }
 
