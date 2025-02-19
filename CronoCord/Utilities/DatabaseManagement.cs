@@ -133,9 +133,9 @@ namespace CronoCord.Utilities
                 _connection = new SQLiteConnection(@"Data Source=mydatabase.db");
                 _connection.Open();
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Console.WriteLine(e.ToString());
+                Console.WriteLine($"Problem with connecting to the database: {ex.Message}");
             }
         }
 
