@@ -7,6 +7,7 @@
 
 
 
+using Discord;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,11 +42,11 @@ namespace CronoCord.Classes
         /// </summary>
         public enum Recurring
         {
-            No,
-            Daily,
-            Weekly,
-            Monthly,
-            Yearly
+            N,
+            D,
+            W,
+            M,
+            Y
         }
 
 
@@ -64,6 +65,33 @@ namespace CronoCord.Classes
             EndTimeUnix = endTimeUnix;
             IsRecurring = recurring;
         }
-    }
 
+
+
+        /// <summary>
+        /// Create an embed using instance data
+        /// </summary>
+        /// <returns>Discord embed</returns>
+        public Embed CreateEmbed()
+        {
+            Dictionary<Recurring, string> expandedRecurring = new Dictionary<Recurring, string>()
+            {
+                {Recurring.N, "Never" },
+                {Recurring.D, "Daily" },
+                {Recurring.W, "Weekly" },
+                {Recurring.M, "Monthly" },
+                {Recurring.Y, "Yearly" }
+            };
+
+            Embed embed = new EmbedBuilder()
+                    .WithTitle($"Successfully created availability slot!")
+                    .WithDescription($"Date: {UtilityMethods.ToUnixTimeStamp(StartTimeUnix, "D")}\n" +
+                                     $"Start Time: {UtilityMethods.ToUnixTimeStamp(StartTimeUnix, "t")}\n" +
+                                     $"End Time: {UtilityMethods.ToUnixTimeStamp(EndTimeUnix, "t")}\n" +
+                                     $"Recurring: {expandedRecurring[IsRecurring]}")
+                    .WithColor(Color.Green)
+                    .Build();
+            return embed;
+        }
+    }
 }
