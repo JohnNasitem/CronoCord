@@ -31,7 +31,7 @@ namespace CronoCord.Interactions.Modals
                          value: DateTime.Now.ToString("MMM d yyyy"));
             AddTextInput(label: "Start Time (12 hour format):",
                          customId: "availability_start_time",
-                         style: TextInputStyle.Short,
+                         style: TextInputStyle.Paragraph,
                          required: true);
             AddTextInput(label: "End Time (12 hour format):",
                          customId: "availability_end_time",

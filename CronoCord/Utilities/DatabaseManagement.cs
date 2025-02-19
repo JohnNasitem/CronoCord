@@ -281,7 +281,7 @@ namespace CronoCord.Utilities
         /// </summary>
         /// <param name="userIDs">list of specific user ids to find, if left null it will get all users</param>
         /// <returns>List of Availability</returns>
-        public static List<Availability> GetAvailabilites(List<ulong> userIDs = null)
+        public static List<Availability> GetAvailabilites(ulong[] userIDs = null)
         {
             List<Availability> availabilities = new List<Availability>();
 
