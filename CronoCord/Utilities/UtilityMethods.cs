@@ -149,13 +149,13 @@ namespace CronoCord
         /// Get the epoch unix timestamp for the latest sunday
         /// </summary>
         /// <returns>epoch unix timestamp</returns>
-        public static long GetSundayUnixTimeStamp(bool previousSunday)
+        public static long GetSundayUnixTimeStamp(bool previousNext)
         {
             DateTime now = DateTime.Now;
 
             // Calculate how many days to go back or forward to reach Sunday
             // DayOfWeek.Sunday == 0
-            int daysToAdd = previousSunday 
+            int daysToAdd = previousNext
                             ? (now.DayOfWeek == 0 ? -7 : -(int)now.DayOfWeek)
                             : (7 - (int)now.DayOfWeek);
 
@@ -163,7 +163,7 @@ namespace CronoCord
             DateTime sunday = now.AddDays(daysToAdd);
 
             // Set of start of previous sunday
-            if (previousSunday)
+            if (previousNext)
                 sunday = sunday.Date;
             // Or end of upcomming sunday
             else
