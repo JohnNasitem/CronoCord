@@ -3,6 +3,9 @@ using Discord;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CronoCord.Utilities;
+using CronoCord.Converters;
+using System;
 
 namespace CronoCord.Interactions.Modals
 {
@@ -36,10 +39,34 @@ namespace CronoCord.Interactions.Modals
             List<SocketMessageComponentData> components = modal.Data.Components.ToList();
             string name = components.First(x => x.CustomId == "event_name").Value;
             string desc = components.First(x => x.CustomId == "event_desc").Value;
-            string startDate = components.First(x => x.CustomId == "event_start_date").Value;
-            string endDate = components.First(x => x.CustomId == "event_end_date").Value;
+            string startDateStr = components.First(x => x.CustomId == "event_start_date").Value;
+            string endDateStr = components.First(x => x.CustomId == "event_end_date").Value;
+            DateTime? startDateTime = UtilityMethods.ParseDateTime(startDateStr);
+            DateTime? endDateTime = UtilityMethods.ParseDateTime(endDateStr);
 
-            await modal.RespondAsync($"Name: {name}\nDescription: {desc}\nStart Date: {startDate}\nEnd Date: {endDate}");
+            string errorMessage = "";
+
+            if (startDateTime == null)
+                errorMessage = $"Start date: \"{startDateStr}\" is in the wrong format!\n";
+            if (endDateStr == null)
+                errorMessage += $"End date: \"{endDateStr}\" is in the wrong format!";
+
+            if (errorMessage != "")
+            {
+                await modal.RespondAsync(errorMessage, ephemeral: true);
+                return;
+            }
+
+            DatabaseManagement.CreateEvent(new Classes.Event(modal.User.Id, name, desc, new DateTimeOffset((DateTime)startDateTime).ToUnixTimeSeconds(), new DateTimeOffset((DateTime)endDateTime).ToUnixTimeSeconds(), modal.Channel.Id));
+
+
+            await modal.RespondAsync(embed: new EmbedBuilder()
+                                    .WithTitle("Successfully created event!")
+                                    .WithDescription($"Name: {name}" +
+                                                     $"From {DataConverter.ToUnixTimeStamp((DateTime)startDateTime)} to {DataConverter.ToUnixTimeStamp((DateTime)endDateTime)}" +
+                                                     $"Description: {desc}")
+                                    .WithColor(Color.Green)
+                                    .Build());
         }
     }
 }
