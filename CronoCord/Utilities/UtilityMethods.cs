@@ -62,7 +62,7 @@ namespace CronoCord
             Match dateTimeMatch = Regex.Match(input, $@"(?i)^({DateRegexString})?\s?({TimeOfDayRegexString})?$");
 
             // Return null if invalid date was inputted
-            if (!dateTimeMatch.Success || !AbbreviatedMonths.Contains(dateTimeMatch.Groups[2].ToString().ToLower()))
+            if (!dateTimeMatch.Success)
                 return null;
 
             //Parse data
@@ -76,6 +76,10 @@ namespace CronoCord
             // only set year, month, and dayOfMonth if all 3 were matched
             if (yearString.Length > 0 && monthString.Length > 0 && domString.Length > 0)
             {
+                // Return null if month doesnt exist
+                if (!AbbreviatedMonths.Contains(dateTimeMatch.Groups[2].ToString().ToLower()))
+                    return null;
+
                 int.TryParse(yearString, out year);
                 month = AbbreviatedMonths.IndexOf(monthString) + 1;
                 int.TryParse(domString, out dayOfMonth);
