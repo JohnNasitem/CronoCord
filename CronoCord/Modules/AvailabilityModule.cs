@@ -91,7 +91,7 @@ namespace CronoCord.Modules
                 if (userSchedule.Count == 0)
                     await RespondAsync($"No availabilities to edit! Use the /add-availability-slot to add one", ephemeral: true);
                 else
-                    await RespondAsync(embed: GenerateEditScheduleEmbed(userSchedule, 2, 0));
+                    await RespondAsync(embed: GenerateEditScheduleEmbed(userSchedule, 2, 0), ephemeral: true);
              else
                     await RespondAsync($"Something went wrong... contact <@{Program.AuthorID}>", ephemeral: true);
         }
