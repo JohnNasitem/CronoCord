@@ -111,6 +111,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Availabilities\MergeAvailabilitiesUnitTest.cs" />
+    <Compile Include="Availabilities\GetTimeIndexUnitTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
