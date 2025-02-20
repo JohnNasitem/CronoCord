@@ -1,9 +1,16 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+﻿//***********************************************************************************
+//Program: MergeAvailabilitiesUnitTest.cs
+//Description: Test unit for Availability.MergeOverlappingSlots
+//Date: Feb 19, 2025
+//Author: John Nasitem
+//***********************************************************************************
+
+
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using CronoCord.Classes;
 using CronoCord.Modules;
-using Discord.Audio.Streams;
 using System.Linq;
 using static CronoCord.Classes.Availability;
 
