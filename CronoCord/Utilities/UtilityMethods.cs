@@ -181,7 +181,7 @@ namespace CronoCord
         /// <returns>Converted DateTime instance</returns>
         public static DateTime ToDateTime(long unixTimeStamp)
         {
-            return DateTimeOffset.FromUnixTimeSeconds(unixTimeStamp).DateTime;
+            return DateTimeOffset.FromUnixTimeSeconds(unixTimeStamp).DateTime.ToLocalTime();
         }
     }
 }
