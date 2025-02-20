@@ -103,6 +103,7 @@ namespace CronoCord.Modules
                 if (startSundayUnix <= availability.StartTimeUnix && availability.EndTimeUnix <= endSaturdayUnix)
                     filtered_availabilities.Add(availability);
 
+                // TODO: Test to make sure that this add a dup with original date
                 // Including repeating availabilities
                 if (availability.IsRecurring != Availability.Recurring.N && availability.StartTimeUnix < endSaturdayUnix)
                 {
@@ -144,16 +145,28 @@ namespace CronoCord.Modules
                             }
                             break;
                         case Availability.Recurring.M:
-                            DateTime originalDate = UtilityMethods.ToDateTime(availability.StartTimeUnix);
-                            int monthsDiff = (offsetedDate.Year - originalDate.Year) * 12 + (offsetedDate.Month - originalDate.Month);
+                            DateTime originalDateM = UtilityMethods.ToDateTime(availability.StartTimeUnix);
+                            int monthsDiff = (offsetedDate.Year - originalDateM.Year) * 12 + (offsetedDate.Month - originalDateM.Month);
 
                             // Get the startTimeunix and endTimeUnix for this month
-                            long offsetStartUnix = new DateTimeOffset(UtilityMethods.ToDateTime(availability.StartTimeUnix).AddMonths(monthsDiff)).ToUnixTimeSeconds();
-                            long offsetEndUnix = new DateTimeOffset(UtilityMethods.ToDateTime(availability.EndTimeUnix).AddMonths(monthsDiff)).ToUnixTimeSeconds();
+                            long offsetStartUnixM = new DateTimeOffset(UtilityMethods.ToDateTime(availability.StartTimeUnix).AddMonths(monthsDiff)).ToUnixTimeSeconds();
+                            long offsetEndUnixM = new DateTimeOffset(UtilityMethods.ToDateTime(availability.EndTimeUnix).AddMonths(monthsDiff)).ToUnixTimeSeconds();
 
                             // Add slot if it is within the selected week's range
-                            if (startSundayUnix <= offsetStartUnix && offsetStartUnix <= endSaturdayUnix)
-                                filtered_availabilities.Add(new Availability(availability.UserID, offsetStartUnix, offsetEndUnix, Availability.Recurring.N));
+                            if (startSundayUnix <= offsetStartUnixM && offsetStartUnixM <= endSaturdayUnix)
+                                filtered_availabilities.Add(new Availability(availability.UserID, offsetStartUnixM, offsetEndUnixM, Availability.Recurring.N));
+                            break;
+                        case Availability.Recurring.Y:
+                            DateTime originalDateY = UtilityMethods.ToDateTime(availability.StartTimeUnix);
+                            int yearDiff = offsetedDate.Year - originalDateY.Year;
+
+                            // Get the startTimeunix and endTimeUnix for this month
+                            long offsetStartUnixY = new DateTimeOffset(UtilityMethods.ToDateTime(availability.StartTimeUnix).AddYears(yearDiff)).ToUnixTimeSeconds();
+                            long offsetEndUnixY = new DateTimeOffset(UtilityMethods.ToDateTime(availability.EndTimeUnix).AddYears(yearDiff)).ToUnixTimeSeconds();
+
+                            // Add slot if it is within the selected week's range
+                            if (startSundayUnix <= offsetStartUnixY && offsetStartUnixY <= endSaturdayUnix)
+                                filtered_availabilities.Add(new Availability(availability.UserID, offsetStartUnixY, offsetEndUnixY, Availability.Recurring.N));
                             break;
                     }
                 }
