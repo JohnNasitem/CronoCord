@@ -110,7 +110,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MergeAvailabilitiesUnitTest.cs" />
+    <Compile Include="Availabilities\MergeAvailabilitiesUnitTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
