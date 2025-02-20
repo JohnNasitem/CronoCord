@@ -21,12 +21,17 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using System.IO;
 using System.Drawing;
+using System.ComponentModel;
+using System.Reactive;
 
 namespace CronoCord.Modules
 {
     public class AvailabilityModule : InteractionModuleBase<SocketInteractionContext>
     {
         private static Random _rand = new Random();
+        private readonly Font COLHEADERFONT = new Font("Arial", 35);
+        private readonly Font ROWHEADERFONT = new Font("Arial", 30);
+
         /// <summary>
         /// Initializes a new instance of the <see cref="AvailabilityModule"/>
         /// </summary>
@@ -88,21 +93,62 @@ namespace CronoCord.Modules
 
             foreach (Availability availability in unfiltered_availabilities)
             {
-                // Include the availabilities happning this week
-                if (UtilityMethods.GetSundayUnixTimeStamp(true) <= availability.StartTimeUnix && availability.StartTimeUnix < UtilityMethods.GetSundayUnixTimeStamp(false))
+                DateTime offsetedDate = DateTime.Now.AddDays(weekOffset * 7);
+
+                // Get selected week's ranges
+                long startSundayUnix = UtilityMethods.GetSundayUnixTimeStamp(true, offsetedDate);
+                long endSaturdayUnix = UtilityMethods.GetSundayUnixTimeStamp(false, offsetedDate) - 1;
+
+                // Include the availabilities happning this week that arent repeating
+                if (startSundayUnix <= availability.StartTimeUnix && availability.EndTimeUnix <= endSaturdayUnix)
                     filtered_availabilities.Add(availability);
+
                 // Including repeating availabilities
-                //else if (availability.IsRecurring != Availability.Recurring.N)
-                //{
-                //    switch (availability.IsRecurring)
-                //    {
-                //        case Availability.Recurring.D:
-                //            DateTime startDate = DateTimeOffset.FromUnixTimeSeconds(availability.StartTimeUnix).DateTime;
+                if (availability.IsRecurring != Availability.Recurring.N && availability.StartTimeUnix < endSaturdayUnix)
+                {
+                    switch (availability.IsRecurring)
+                    {
+                        case Availability.Recurring.D:
+                            // Skip original day as it is already handled
+                            long startTimeUnix = availability.StartTimeUnix + 86_400;
+                            long endTimeUnix = availability.EndTimeUnix + 86_400;
 
+                            // If original start date is before selected week's sunday then use sunday as start date
+                            if (availability.StartTimeUnix < startSundayUnix)
+                            {
+                                // Add time of day to startSundayUnix
+                                startTimeUnix = startSundayUnix + (int)UtilityMethods.ToDateTime(availability.StartTimeUnix).TimeOfDay.TotalSeconds;
+                                endTimeUnix = startSundayUnix + (int)UtilityMethods.ToDateTime(availability.EndTimeUnix).TimeOfDay.TotalSeconds;
+                            }
 
-                //            break;
-                //    }
-                //}
+                            for (int i = 0; i < 7; i++)
+                            {
+                                // Break if the date that is gonna be added is not in selected week's range
+                                if (startTimeUnix + (86_400 * i) > endSaturdayUnix)
+                                    break;
+
+                                filtered_availabilities.Add(new Availability(availability.UserID, startTimeUnix + (86_400 * i), endTimeUnix + (86_400 * i), Availability.Recurring.N));
+                            }
+                            break;
+
+                        case Availability.Recurring.W:
+                            // Dont add a new availability if the original is still in selected week's range
+                            if (availability.StartTimeUnix < startSundayUnix)
+                            {
+                                int daysFromSunday = (int)((availability.StartTimeUnix + 4 * 86_400) % 604_800 / 86_400);
+                                filtered_availabilities.Add(new Availability(availability.UserID,
+                                                                             // For both start and end time add the day and time offset to the selected week's sunday
+                                                                             startSundayUnix + (daysFromSunday * 86_400) + (int)UtilityMethods.ToDateTime(availability.StartTimeUnix).TimeOfDay.TotalSeconds,
+                                                                             startSundayUnix + (daysFromSunday * 86_400) + (int)UtilityMethods.ToDateTime(availability.EndTimeUnix).TimeOfDay.TotalSeconds,
+                                                                             Availability.Recurring.N));
+                            }
+                            break;
+                        //case Availability.Recurring.M:
+                        //    DateTime currentDate = UtilityMethods.ToDateTime(availability.StartTimeUnix);
+                        
+                        //    break;
+                    }
+                }
             }
 
             GenerateScheduleImage(filtered_availabilities, weekOffset, showOverlapCount);
@@ -111,15 +157,21 @@ namespace CronoCord.Modules
 
         private void GenerateScheduleImage(List<Availability> availabilities, int weekOffset, bool showOverlapCount)
         {
-            // TODO: this breaks when availabilities is empty
-            List<ulong> uniqueIDs = availabilities.Select(a => a.UserID).Distinct().ToList();
-            Dictionary<ulong, System.Drawing.Color> userColours = GenerateUserColours(uniqueIDs);
-
-            //Does it need to be sorted?
-            availabilities.Sort((a1, a2) => a1.StartTimeUnix.CompareTo(a2.StartTimeUnix));
-
+            List<ulong> uniqueIDs = null;
+            Dictionary<ulong, SolidBrush> userColours = null;
             int backgroundWidth = 2300;
-            System.Drawing.Size imageSize = new System.Drawing.Size(uniqueIDs.Count == 0 ? backgroundWidth : backgroundWidth + 400, 2500);
+            if (availabilities.Count > 0)
+            {
+                availabilities = MergeOverlappingSlots(availabilities);
+                uniqueIDs = availabilities.Select(a => a.UserID).Distinct().ToList();
+                userColours = GenerateUserColours(uniqueIDs).Select(kvp => new KeyValuePair<ulong, SolidBrush>(kvp.Key, new SolidBrush(kvp.Value))).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                //Does it need to be sorted?
+                availabilities.Sort((a1, a2) => a1.StartTimeUnix.CompareTo(a2.StartTimeUnix));
+            }
+            else
+                uniqueIDs = new List<ulong>();
+
+            System.Drawing.Size imageSize = new System.Drawing.Size(uniqueIDs.Count < 2 ? backgroundWidth : backgroundWidth + 400, 2500);
 
             // Create schedule bitmap
             using (Bitmap bm = new Bitmap(imageSize.Width, imageSize.Height))
@@ -129,24 +181,59 @@ namespace CronoCord.Modules
                 {
                     // Set the background color to white
                     graphics.Clear(System.Drawing.Color.White);
+                    Brush textBrush = new SolidBrush(System.Drawing.Color.Black);
 
-                    // Draw a semi-transparent red rectangle
-                    using (Brush redBrush = new SolidBrush(System.Drawing.Color.FromArgb(128, 255, 0, 0))) // Alpha = 128
+                    // Populate row headers and draw horizontal lines
+                    for (int rowIndex = 0; rowIndex < 48; rowIndex++)
                     {
-                        graphics.FillRectangle(redBrush, 100, 100, 200, 150);
+                        //Add row header
+                        string text = (rowIndex % 24 / 2).ToString();
+                        if (text == "0")
+                            text = "12";
+
+                        text += rowIndex % 2 == 0 ? ":00" : ":30";
+                        text += rowIndex < 24 ? " am" : " pm";
+                        SizeF textSize = graphics.MeasureString(text, ROWHEADERFONT);
+                        PointF textPos = new PointF(100 - textSize.Width / 2, 135 + (rowIndex * 50) - textSize.Height / 2);
+                        graphics.DrawString(text, ROWHEADERFONT, textBrush, textPos);
+
+                        // Add horizontal line
+                        graphics.DrawLine(Pens.Black, 0, 100 + (rowIndex * 50), backgroundWidth, 100 + (rowIndex * 50));
                     }
 
-                    // Draw a blue line
-                    using (Pen bluePen = new Pen(System.Drawing.Color.Blue, 5)) // Width = 5
+                    // Unix for the sunday of the specified week
+                    long thisWeekSundayUnix = UtilityMethods.GetSundayUnixTimeStamp(true, DateTime.Now.AddDays(weekOffset * 7));
+                    // Populate column headers and draw vertical lines
+                    foreach (DayOfWeek day in Enum.GetValues(typeof(DayOfWeek)))
                     {
-                        graphics.DrawLine(bluePen, 50, 50, 300, 300);
+                        // Add date column header
+                        string dateText = UtilityMethods.ToDateTime(thisWeekSundayUnix + ((int)day * 86400)).ToString("MMM d");
+                        SizeF dateTextSize = graphics.MeasureString(dateText, COLHEADERFONT);
+                        PointF datetTextPos = new PointF(350 + ((int)day * 300) - dateTextSize.Width / 2, 25 - dateTextSize.Height / 2);
+                        graphics.DrawString(dateText, COLHEADERFONT, textBrush, datetTextPos);
+
+                        // Add date of the week column header
+                        string dayText = Enum.GetName(typeof(DayOfWeek), day);
+                        SizeF dayTextSize = graphics.MeasureString(dayText, COLHEADERFONT);
+                        PointF daytTextPos = new PointF(350 + ((int)day * 300) - dayTextSize.Width / 2, 75 - dayTextSize.Height / 2);
+                        graphics.DrawString(dayText, COLHEADERFONT, textBrush, daytTextPos);
+
+                        //Add vertical line
+                        graphics.DrawLine(Pens.Black, 200 + ((int)day * 300), 0, 200 + ((int)day * 300), imageSize.Height);
                     }
 
-                    // Draw some text
-                    using (Font font = new Font("Arial", 24))
-                    using (Brush textBrush = new SolidBrush(System.Drawing.Color.Black))
+                    // Add the availabilities slots
+                    foreach (Availability availability in availabilities)
                     {
-                        graphics.DrawString("Hello, World!", font, textBrush, new PointF(50, 400));
+                        // Get y start and end positons
+                        List<int> yPositions = new List<int>();
+                        DateTime date = UtilityMethods.ToDateTime(availability.StartTimeUnix);
+                        foreach (long unix in new long[] { availability.StartTimeUnix, availability.EndTimeUnix })
+                            yPositions.Add(100 + (GetTimeIndex(UtilityMethods.ToDateTime(unix).ToString("hh:mm tt")) * 50));
+
+                        //Draw rectangle
+                        Rectangle rect = new Rectangle(200 + ((int)date.DayOfWeek * 300), yPositions[0], 300, yPositions[1] - yPositions[0]);
+                        graphics.FillRectangle(userColours[availability.UserID], rect);
                     }
                 }
                 bm.Save("schedule.png", System.Drawing.Imaging.ImageFormat.Png);
@@ -188,6 +275,66 @@ namespace CronoCord.Modules
             }
 
             return userColours;
+        }
+
+
+
+        /// <summary>
+        /// Convert a time to a time index (row index in the schedule)
+        /// </summary>
+        /// <param name="time">Time to convert</param>
+        /// <returns>time index</returns>
+        public static int GetTimeIndex(string time)
+        {
+            time = time.ToLower().Trim();
+            Match timeMatch = Regex.Match(time, UtilityMethods.TimeOfDayRegexString);
+
+            // return -1 if one of the needed groups didnt match
+            if (timeMatch.Groups[4].Value == "" || timeMatch.Groups[1].Value == "" || timeMatch.Groups[3].Value == "")
+                return -1;
+
+            int timeIndex = timeMatch.Groups[4].Value == "am" ? 0 : 24;
+            timeIndex += (int.Parse(timeMatch.Groups[1].Value) % 12) * 2;
+            timeIndex += int.Parse(timeMatch.Groups[3].Value) < 30 ? 0 : 1;
+            return timeIndex;
+        }
+
+
+
+        /// <summary>
+        /// Merge any slots that are overlapping and are from the same user
+        /// </summary>
+        /// <param name="unmergedSlots">unmerged availability slots</param>
+        /// <returns>merged availability slots</returns>
+        public static List<Availability> MergeOverlappingSlots(List<Availability> unmergedSlots)
+        {
+            Dictionary<ulong, List<Availability>> usersSlots = unmergedSlots.GroupBy(availability => availability.UserID).ToDictionary(group => group.Key, group => group.OrderBy(a => a.StartTimeUnix).ToList());
+            List<ulong> userIDs = usersSlots.Keys.ToList();
+            foreach (ulong userID in userIDs)
+            {
+                List<Availability> mergedSlots = new List<Availability>();
+                List<Availability> unmergedUserSlots = usersSlots[userID];
+                while (unmergedUserSlots.Count > 0)
+                {
+                    int mergedSlotCount = 1;
+                    Availability currentSlot = unmergedUserSlots[0];
+                    do
+                    {
+                        List<Availability> slotsToMerge = unmergedUserSlots.Where(other => currentSlot.Overlaps(other)).ToList();
+                        mergedSlotCount = unmergedUserSlots.RemoveAll(a => slotsToMerge.Contains(a));
+                        currentSlot = new Availability(userID, slotsToMerge.Min(a => a.StartTimeUnix), slotsToMerge.Max(a => a.EndTimeUnix), Availability.Recurring.N);
+
+                        if (mergedSlotCount > 1)
+                            unmergedUserSlots.Add(currentSlot);
+                    }
+                    while (mergedSlotCount > 1);
+
+                    mergedSlots.Add(currentSlot);
+                }
+                usersSlots[userID] = mergedSlots;
+            }
+
+            return usersSlots.SelectMany(group => group.Value).ToList();
         }
     }
 }
