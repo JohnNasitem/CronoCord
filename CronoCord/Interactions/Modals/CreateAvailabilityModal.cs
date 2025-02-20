@@ -76,6 +76,13 @@ namespace CronoCord.Interactions.Modals
             DateTime startDateTime = ((DateTime)date).Date.Add(((DateTime)startTime).TimeOfDay);
             DateTime endDateTime = ((DateTime)date).Date.Add(((DateTime)endTime).TimeOfDay);
 
+            if (!(startDateTime < endDateTime))
+            {
+                await modal.RespondAsync("Start time must be before end time!", ephemeral: true);
+                return;
+            }
+
+
             bool success = false;
 
             Availability availabilityDetails = new Availability(modal.User.Id, new DateTimeOffset(startDateTime).ToUnixTimeSeconds(), new DateTimeOffset(endDateTime).ToUnixTimeSeconds(), recurring);
