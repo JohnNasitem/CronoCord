@@ -23,6 +23,8 @@ using System.IO;
 using System.Drawing;
 using System.ComponentModel;
 using System.Reactive;
+using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ProgressBar;
 
 namespace CronoCord.Modules
 {
@@ -172,27 +174,24 @@ namespace CronoCord.Modules
                 }
             }
 
-            GenerateScheduleImage(filtered_availabilities, weekOffset, showOverlapCount);
+            GenerateScheduleImage(users, filtered_availabilities, weekOffset, showOverlapCount);
             await RespondWithFileAsync("schedule.png", text: "Here is your schedule!");
         }
 
-        private void GenerateScheduleImage(List<Availability> availabilities, int weekOffset, bool showOverlapCount)
+        private void GenerateScheduleImage(List<IUser> mentionedUsers, List<Availability> availabilities, int weekOffset, bool showOverlapCount)
         {
-            List<ulong> uniqueIDs = null;
+            List<ulong> mentionedUsersID = mentionedUsers.Select(u => u.Id).ToList();
             Dictionary<ulong, SolidBrush> userColours = null;
             int backgroundWidth = 2300;
             if (availabilities.Count > 0)
             {
                 availabilities = MergeOverlappingSlots(availabilities);
-                uniqueIDs = availabilities.Select(a => a.UserID).Distinct().ToList();
-                userColours = GenerateUserColours(uniqueIDs).Select(kvp => new KeyValuePair<ulong, SolidBrush>(kvp.Key, new SolidBrush(kvp.Value))).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                userColours = GenerateUserColours(mentionedUsersID).Select(kvp => new KeyValuePair<ulong, SolidBrush>(kvp.Key, new SolidBrush(kvp.Value))).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
                 //Does it need to be sorted?
                 availabilities.Sort((a1, a2) => a1.StartTimeUnix.CompareTo(a2.StartTimeUnix));
             }
-            else
-                uniqueIDs = new List<ulong>();
 
-            System.Drawing.Size imageSize = new System.Drawing.Size(uniqueIDs.Count < 2 ? backgroundWidth : backgroundWidth + 400, 2500);
+            System.Drawing.Size imageSize = new System.Drawing.Size(mentionedUsersID.Count < 2 ? backgroundWidth : backgroundWidth + 400, 2500);
 
             // Create schedule bitmap
             using (Bitmap bm = new Bitmap(imageSize.Width, imageSize.Height))
@@ -202,7 +201,6 @@ namespace CronoCord.Modules
                 {
                     // Set the background color to white
                     graphics.Clear(System.Drawing.Color.White);
-                    Brush textBrush = new SolidBrush(System.Drawing.Color.Black);
 
                     // Populate row headers and draw horizontal lines
                     for (int rowIndex = 0; rowIndex < 48; rowIndex++)
@@ -216,7 +214,7 @@ namespace CronoCord.Modules
                         text += rowIndex < 24 ? " am" : " pm";
                         SizeF textSize = graphics.MeasureString(text, ROWHEADERFONT);
                         PointF textPos = new PointF(100 - textSize.Width / 2, 135 + (rowIndex * 50) - textSize.Height / 2);
-                        graphics.DrawString(text, ROWHEADERFONT, textBrush, textPos);
+                        graphics.DrawString(text, ROWHEADERFONT, Brushes.Black, textPos);
 
                         // Add horizontal line
                         graphics.DrawLine(Pens.Black, 0, 100 + (rowIndex * 50), backgroundWidth, 100 + (rowIndex * 50));
@@ -231,13 +229,13 @@ namespace CronoCord.Modules
                         string dateText = UtilityMethods.ToDateTime(thisWeekSundayUnix + ((int)day * 86400)).ToString("MMM d");
                         SizeF dateTextSize = graphics.MeasureString(dateText, COLHEADERFONT);
                         PointF datetTextPos = new PointF(350 + ((int)day * 300) - dateTextSize.Width / 2, 25 - dateTextSize.Height / 2);
-                        graphics.DrawString(dateText, COLHEADERFONT, textBrush, datetTextPos);
+                        graphics.DrawString(dateText, COLHEADERFONT, Brushes.Black, datetTextPos);
 
                         // Add date of the week column header
                         string dayText = Enum.GetName(typeof(DayOfWeek), day);
                         SizeF dayTextSize = graphics.MeasureString(dayText, COLHEADERFONT);
                         PointF daytTextPos = new PointF(350 + ((int)day * 300) - dayTextSize.Width / 2, 75 - dayTextSize.Height / 2);
-                        graphics.DrawString(dayText, COLHEADERFONT, textBrush, daytTextPos);
+                        graphics.DrawString(dayText, COLHEADERFONT, Brushes.Black, daytTextPos);
 
                         //Add vertical line
                         graphics.DrawLine(Pens.Black, 200 + ((int)day * 300), 0, 200 + ((int)day * 300), imageSize.Height);
@@ -255,6 +253,53 @@ namespace CronoCord.Modules
                         //Draw rectangle
                         Rectangle rect = new Rectangle(200 + ((int)date.DayOfWeek * 300), yPositions[0], 300, yPositions[1] - yPositions[0]);
                         graphics.FillRectangle(userColours[availability.UserID], rect);
+                    }
+
+
+                    // Display the number of overlaps in each cell
+                    if (showOverlapCount && availabilities.Count > 0)
+                    {
+                        // Quadratic loop to iterate through each cell
+                        foreach (DayOfWeek day in Enum.GetValues(typeof(DayOfWeek)))
+                        {
+                            for (int rowIndex = 0; rowIndex < 48; rowIndex++)
+                            {
+                                // Count the number of overlaps in this cell that on the same day
+                                int count = availabilities.Count(a => GetTimeIndex(UtilityMethods.ToDateTime(a.StartTimeUnix).ToString("HH:MM tt")) <= rowIndex 
+                                                                   && rowIndex < GetTimeIndex(UtilityMethods.ToDateTime(a.EndTimeUnix).ToString("HH:MM tt")) 
+                                                                   && UtilityMethods.ToDateTime(a.StartTimeUnix).DayOfWeek == day);
+
+                                // Add count text if count isnt 0
+                                if (count > 0)
+                                {
+                                    string dateText = count.ToString();
+                                    SizeF dateTextSize = graphics.MeasureString(dateText, ROWHEADERFONT);
+                                    PointF datetTextPos = new PointF(350 + ((int)day * 300) - dateTextSize.Width / 2, 135 + (rowIndex * 50) - dateTextSize.Height / 2);
+                                    graphics.DrawString(dateText, ROWHEADERFONT, Brushes.Black, datetTextPos);
+                                } 
+                            }
+                        }
+                    }
+
+                    // Display color legend
+                    if (mentionedUsers.Count > 0)
+                    {
+                        // Add another vertical line to seperate legend from schedule
+                        graphics.DrawLine(Pens.Black, 200 + (7 * 300), 0, 200 + (7* 300), imageSize.Height);
+
+                        for (int i = 0; i < mentionedUsers.Count; i++)
+                        {
+                            IUser user = mentionedUsers[i];
+
+                            // Add rectangle
+                            graphics.FillRectangle(userColours[user.Id], new RectangleF(backgroundWidth, i * 50, 400, 50));
+
+                            // Add display name
+                            string dateText = user.GlobalName;
+                            SizeF dateTextSize = graphics.MeasureString(dateText, ROWHEADERFONT);
+                            PointF datetTextPos = new PointF(backgroundWidth + 200 - dateTextSize.Width / 2, 35 + (i * 50)  - dateTextSize.Height / 2);
+                            graphics.DrawString(dateText, ROWHEADERFONT, Brushes.Black, datetTextPos);
+                        }
                     }
                 }
                 bm.Save("schedule.png", System.Drawing.Imaging.ImageFormat.Png);
