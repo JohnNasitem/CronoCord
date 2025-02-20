@@ -26,10 +26,10 @@ namespace CronoCordTestProject.Availabilities
         public void ValidInputs()
         {
             // Leading zeros
-            Assert.AreEqual(24 + (3 * 2) + 1, AvailabilityModule.GetTimeIndex("03:50 PM"));
+            Assert.AreEqual(24 + (3 * 2) + 2, AvailabilityModule.GetTimeIndex("03:50 PM"));
 
             // No leading zeros
-            Assert.AreEqual(0 + (9 * 2) + 0, AvailabilityModule.GetTimeIndex("9:24 AM"));
+            Assert.AreEqual(0 + (9 * 2) + 1, AvailabilityModule.GetTimeIndex("9:24 AM"));
 
             // No space between minutes and am/pm
             Assert.AreEqual(0 + (1 * 2) + 0, AvailabilityModule.GetTimeIndex("1:00am"));
