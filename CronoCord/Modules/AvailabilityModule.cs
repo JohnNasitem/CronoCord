@@ -114,7 +114,6 @@ namespace CronoCord.Modules
                 if (startSundayUnix <= availability.StartTimeUnix && availability.EndTimeUnix <= endSaturdayUnix)
                     filtered_availabilities.Add(availability);
 
-                // TODO: Test to make sure that this add a dup with original date
                 // Including repeating availabilities
                 if (availability.IsRecurring != Availability.Recurring.N && availability.StartTimeUnix < endSaturdayUnix)
                 {
@@ -381,7 +380,13 @@ namespace CronoCord.Modules
 
             int timeIndex = timeMatch.Groups[4].Value == "am" ? 0 : 24;
             timeIndex += (int.Parse(timeMatch.Groups[1].Value) % 12) * 2;
-            timeIndex += int.Parse(timeMatch.Groups[3].Value) < 30 ? 0 : 1;
+
+            int minutes = int.Parse(timeMatch.Groups[3].Value);
+
+            if (15 <= minutes && minutes < 45)
+                timeIndex += 1;
+            else if (45 <= minutes && minutes < 60)
+                timeIndex += 2;
             return timeIndex;
         }
 
