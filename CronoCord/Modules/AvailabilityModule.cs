@@ -329,22 +329,30 @@ namespace CronoCord.Modules
         /// <returns>merged availability slots</returns>
         public static List<Availability> MergeOverlappingSlots(List<Availability> unmergedSlots)
         {
-            Dictionary<ulong, List<Availability>> usersSlots = unmergedSlots.GroupBy(availability => availability.UserID).ToDictionary(group => group.Key, group => group.OrderBy(a => a.StartTimeUnix).ToList());
+            // Group availability slots by user and get a list of keys
+            Dictionary<ulong, List<Availability>> usersSlots = unmergedSlots.GroupBy(availability => availability.UserID).ToDictionary(group => group.Key, group => group.ToList());
             List<ulong> userIDs = usersSlots.Keys.ToList();
+
+            // Foreach slots under a user, merge overlapping slots
             foreach (ulong userID in userIDs)
             {
                 List<Availability> mergedSlots = new List<Availability>();
                 List<Availability> unmergedUserSlots = usersSlots[userID];
+
+                // Iterate until all slots have been accounted for
                 while (unmergedUserSlots.Count > 0)
                 {
                     int mergedSlotCount = 1;
                     Availability currentSlot = unmergedUserSlots[0];
+
+                    // Continue to merge until no more slots overlap with current slot
                     do
                     {
                         List<Availability> slotsToMerge = unmergedUserSlots.Where(other => currentSlot.Overlaps(other)).ToList();
                         mergedSlotCount = unmergedUserSlots.RemoveAll(a => slotsToMerge.Contains(a));
                         currentSlot = new Availability(userID, slotsToMerge.Min(a => a.StartTimeUnix), slotsToMerge.Max(a => a.EndTimeUnix), Availability.Recurring.N);
 
+                        // If at least 2 slots were merged put slot back in to see if new slot will overlap with other
                         if (mergedSlotCount > 1)
                             unmergedUserSlots.Add(currentSlot);
                     }
