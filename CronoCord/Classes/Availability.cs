@@ -113,12 +113,32 @@ namespace CronoCord.Classes
 
 
         /// <summary>
+        /// Checks whether this instance's start and end times overlaps with another instance's start and end times
+        /// </summary>
+        /// <param name="other">Other instance</param>
+        /// <returns>true if this instance does overlap with the specified instance</returns>
+        public bool Overlaps(Availability other)
+        {
+            return (other.StartTimeUnix <= StartTimeUnix && StartTimeUnix <= other.EndTimeUnix)
+                || (other.StartTimeUnix <= EndTimeUnix && EndTimeUnix <= other.EndTimeUnix);
+        }
+
+
+
+        /// <summary>
         /// Return 1
         /// </summary>
         /// <returns>1</returns>
         public override int GetHashCode()
         {
             return 1;
+        }
+
+
+
+        public override string ToString()
+        {
+            return $"UserID: {UserID} - StartTimeUnix: {StartTimeUnix} - EndTimeUnix: {EndTimeUnix} - Recurring: {Enum.GetName(typeof(Recurring), IsRecurring)}";
         }
     }
 }
