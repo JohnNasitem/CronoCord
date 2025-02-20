@@ -89,7 +89,7 @@ namespace CronoCord.Interactions.Modals
             await Task.Run(() => success = DatabaseManagement.CreateAvailability(availabilityDetails));
 
             if (success)
-                await modal.RespondAsync(embed: availabilityDetails.CreateEmbed(), ephemeral: true);
+                await modal.RespondAsync(embed: availabilityDetails.CreateSucessEmbed(), ephemeral: true);
             else
                 await modal.RespondAsync($"Something went wrong... contact <@{Program.AuthorID}>", ephemeral: true);
 

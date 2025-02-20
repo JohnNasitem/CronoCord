@@ -72,7 +72,7 @@ namespace CronoCord.Interactions.Modals
             if (success)
             {
                 await modal.RespondAsync("Event created successfully!", ephemeral: true);
-                await modal.FollowupAsync(embed: eventDetails.CreateEventEmbed());
+                await modal.FollowupAsync(embed: eventDetails.CreateSucessEmbed());
             }
             else
                 await modal.RespondAsync($"Something went wrong... contact <@{Program.AuthorID}>", ephemeral: true);

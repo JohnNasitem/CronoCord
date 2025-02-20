@@ -73,7 +73,7 @@ namespace CronoCord.Classes
         /// Create an embed using instance data
         /// </summary>
         /// <returns>Discord embed</returns>
-        public Embed CreateEmbed()
+        public Embed CreateSucessEmbed()
         {
             Dictionary<Recurring, string> expandedRecurring = new Dictionary<Recurring, string>()
             {

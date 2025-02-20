@@ -122,7 +122,7 @@ namespace CronoCord.Classes
         /// Create an embed using instance data
         /// </summary>
         /// <returns>Discord embed</returns>
-        public Embed CreateEventEmbed()
+        public Embed CreateSucessEmbed()
         {
             Embed embed = new EmbedBuilder()
                     .WithTitle($"Event: {Name}")
