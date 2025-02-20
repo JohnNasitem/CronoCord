@@ -1,6 +1,6 @@
 ﻿//***********************************************************************************
 //Program: CreateAvailabilityModal.cs
-//Description: Modal for creating an event
+//Description: Modal for creating an availability
 //Date: Feb 18, 2025
 //Author: John Nasitem
 //***********************************************************************************
@@ -18,9 +18,9 @@ using System.Threading.Tasks;
 
 namespace CronoCord.Interactions.Modals
 {
-    public class CreateAvailabilityModal : ModalBuilder
+    public class EditAvailabilityModal : ModalBuilder
     {
-        public CreateAvailabilityModal()
+        public EditAvailabilityModal()
         {
             Title = "Create Availability Slot";
             CustomId = "create_availability";
