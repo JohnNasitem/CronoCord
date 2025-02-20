@@ -18,9 +18,9 @@ using System.Threading.Tasks;
 
 namespace CronoCord.Interactions.Modals
 {
-    public class EditAvailabilityModal : ModalBuilder
+    public class CreateAvailabilityModal : ModalBuilder
     {
-        public EditAvailabilityModal()
+        public CreateAvailabilityModal()
         {
             Title = "Create Availability Slot";
             CustomId = "create_availability";
