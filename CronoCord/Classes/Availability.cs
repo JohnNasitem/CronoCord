@@ -93,5 +93,32 @@ namespace CronoCord.Classes
                     .Build();
             return embed;
         }
+
+
+
+        /// <summary>
+        /// Logical equality
+        /// </summary>
+        /// <param name="obj">object to compare to</param>
+        /// <returns>true if specified object is logically equal</returns>
+        public override bool Equals(object obj)
+        {
+            if (!(obj is Availability other))
+                return false;
+
+            // Logically equality
+            return UserID.Equals(other.UserID) && StartTimeUnix.Equals(other.StartTimeUnix) && EndTimeUnix.Equals(other.EndTimeUnix) && IsRecurring.Equals(other.IsRecurring);
+        }
+
+
+
+        /// <summary>
+        /// Return 1
+        /// </summary>
+        /// <returns>1</returns>
+        public override int GetHashCode()
+        {
+            return 1;
+        }
     }
 }
