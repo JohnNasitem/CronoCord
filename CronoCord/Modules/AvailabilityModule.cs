@@ -143,10 +143,18 @@ namespace CronoCord.Modules
                                                                              Availability.Recurring.N));
                             }
                             break;
-                        //case Availability.Recurring.M:
-                        //    DateTime currentDate = UtilityMethods.ToDateTime(availability.StartTimeUnix);
-                        
-                        //    break;
+                        case Availability.Recurring.M:
+                            DateTime originalDate = UtilityMethods.ToDateTime(availability.StartTimeUnix);
+                            int monthsDiff = (offsetedDate.Year - originalDate.Year) * 12 + (offsetedDate.Month - originalDate.Month);
+
+                            // Get the startTimeunix and endTimeUnix for this month
+                            long offsetStartUnix = new DateTimeOffset(UtilityMethods.ToDateTime(availability.StartTimeUnix).AddMonths(monthsDiff)).ToUnixTimeSeconds();
+                            long offsetEndUnix = new DateTimeOffset(UtilityMethods.ToDateTime(availability.EndTimeUnix).AddMonths(monthsDiff)).ToUnixTimeSeconds();
+
+                            // Add slot if it is within the selected week's range
+                            if (startSundayUnix <= offsetStartUnix && offsetStartUnix <= endSaturdayUnix)
+                                filtered_availabilities.Add(new Availability(availability.UserID, offsetStartUnix, offsetEndUnix, Availability.Recurring.N));
+                            break;
                     }
                 }
             }
