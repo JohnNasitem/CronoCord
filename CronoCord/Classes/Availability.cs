@@ -91,6 +91,7 @@ namespace CronoCord.Classes
                                      $"End Time: {UtilityMethods.ToUnixTimeStamp(EndTimeUnix, "t")}\n" +
                                      $"Recurring: {expandedRecurring[IsRecurring]}")
                     .WithColor(Discord.Color.Green)
+                    .AddField("Other Commands", "Use /edit-schedule to edit your availability slots\nUse /view-schedule to view your schedule", false)
                     .Build();
             return embed;
         }
