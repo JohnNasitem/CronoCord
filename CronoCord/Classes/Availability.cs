@@ -10,6 +10,7 @@
 using Discord;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -89,7 +90,7 @@ namespace CronoCord.Classes
                                      $"Start Time: {UtilityMethods.ToUnixTimeStamp(StartTimeUnix, "t")}\n" +
                                      $"End Time: {UtilityMethods.ToUnixTimeStamp(EndTimeUnix, "t")}\n" +
                                      $"Recurring: {expandedRecurring[IsRecurring]}")
-                    .WithColor(Color.Green)
+                    .WithColor(Discord.Color.Green)
                     .Build();
             return embed;
         }
@@ -119,8 +120,7 @@ namespace CronoCord.Classes
         /// <returns>true if this instance does overlap with the specified instance</returns>
         public bool Overlaps(Availability other)
         {
-            return (other.StartTimeUnix <= StartTimeUnix && StartTimeUnix <= other.EndTimeUnix)
-                || (other.StartTimeUnix <= EndTimeUnix && EndTimeUnix <= other.EndTimeUnix);
+            return other.StartTimeUnix <= EndTimeUnix && StartTimeUnix <= other.EndTimeUnix;
         }
 
 
