@@ -76,6 +76,15 @@ namespace CronoCord.Modules
             await ViewSchedule(users, weekOffset, showOverlapCount);
         }
 
+
+
+        /// <summary>
+        /// View the schedule of the specified week with specified users
+        /// </summary>
+        /// <param name="users">Users availabilities to view</param>
+        /// <param name="weekOffset">Week number offset from current week</param>
+        /// <param name="showOverlapCount">Should overlap count be shown</param>
+        /// <returns></returns>
         private async Task ViewSchedule(List<IUser> users, int weekOffset, bool showOverlapCount)
         {
             List<Availability> unfiltered_availabilities = null;
@@ -178,6 +187,15 @@ namespace CronoCord.Modules
             await RespondWithFileAsync("schedule.png", text: "Here is your schedule!");
         }
 
+
+
+        /// <summary>
+        /// Generates a schedule image in the file path "schedule.png"
+        /// </summary>
+        /// <param name="mentionedUsers">mentioned users</param>
+        /// <param name="availabilities">availability slots</param>
+        /// <param name="weekOffset">week offset from current week</param>
+        /// <param name="showOverlapCount">Should overlap count be shown</param>
         private void GenerateScheduleImage(List<IUser> mentionedUsers, List<Availability> availabilities, int weekOffset, bool showOverlapCount)
         {
             List<ulong> mentionedUsersID = mentionedUsers.Select(u => u.Id).ToList();
@@ -265,8 +283,8 @@ namespace CronoCord.Modules
                             for (int rowIndex = 0; rowIndex < 48; rowIndex++)
                             {
                                 // Count the number of overlaps in this cell that on the same day
-                                int count = availabilities.Count(a => GetTimeIndex(UtilityMethods.ToDateTime(a.StartTimeUnix).ToString("HH:MM tt")) <= rowIndex 
-                                                                   && rowIndex < GetTimeIndex(UtilityMethods.ToDateTime(a.EndTimeUnix).ToString("HH:MM tt")) 
+                                int count = availabilities.Count(a => GetTimeIndex(UtilityMethods.ToDateTime(a.StartTimeUnix).ToString("hh:mm tt")) <= rowIndex
+                                                                   && rowIndex < GetTimeIndex(UtilityMethods.ToDateTime(a.EndTimeUnix).ToString("hh:mm tt"))
                                                                    && UtilityMethods.ToDateTime(a.StartTimeUnix).DayOfWeek == day);
 
                                 // Add count text if count isnt 0
@@ -305,6 +323,8 @@ namespace CronoCord.Modules
                 bm.Save("schedule.png", System.Drawing.Imaging.ImageFormat.Png);
             }
         }
+
+
 
         /// <summary>
         /// Generate a unique color for each user
