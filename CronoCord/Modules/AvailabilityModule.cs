@@ -70,9 +70,9 @@ namespace CronoCord.Modules
         /// <returns></returns>
         [SlashCommand("view-schedule", "View schedules")]
         public async Task ViewScheduleCommand(
-            [Summary("users", "The user whose schedule you want to view")] string usersStr = "",
-            [Summary("week_offset", "The week offset for the schedule (positive only)")] int weekOffset = 0,
-            [Summary("show_overlap-Count", "Whether to show the count of overlapping events")] bool showOverlapCount = false)
+            [Summary("users", "Mention the users you want to view availabilities for. eg @CronoCord")] string usersStr = "",
+            [Summary("week_offset", "How many weeks ahead to view. eg 1 means next week")] int weekOffset = 0,
+            [Summary("show_overlap-Count", "Show how many slots are overlapping each cell.")] bool showOverlapCount = false)
         {
             try
             {

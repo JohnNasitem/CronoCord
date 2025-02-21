@@ -48,7 +48,7 @@ namespace CronoCord.Interactions.MessageComponents
             ButtonBuilder nextButton = new ButtonBuilder()
                     .WithCustomId($"edit-schedule-button:next,{amountToDisplay},{offset}")
                     .WithLabel("Next")
-                    .WithDisabled(offset + amountToDisplay > availabilitesToDisplay.Count)
+                    .WithDisabled(offset + amountToDisplay >= availabilitesToDisplay.Count)
                     .WithStyle(ButtonStyle.Secondary);
 
             // Populate embed fields and select options with the visible availabilities
@@ -64,7 +64,7 @@ namespace CronoCord.Interactions.MessageComponents
                 DateTime endTime = UtilityMethods.ToDateTime(a.EndTimeUnix);
 
                 embedMenu.AddField($"{i + 1} - {UtilityMethods.ToUnixTimeStamp(a.StartTimeUnix, "D")}", $"{UtilityMethods.ToUnixTimeStamp(a.StartTimeUnix, "t")} - {UtilityMethods.ToUnixTimeStamp(a.EndTimeUnix, "t")}", false);
-                selectMenu.AddOption($"{i + 1} - {startTime.ToString("MMM d yyyy")}", $"{a.StartTimeUnix},{a.EndTimeUnix},{Enum.GetName(typeof(Availability.Recurring), a.IsRecurring)}", $"{startTime.ToString("hh:mm tt")} - {endTime.ToString("hh:mm tt")}");
+                selectMenu.AddOption($"{i + 1} - {startTime.ToString("MMM d yyyy")}", $"{a.StartTimeUnix},{a.EndTimeUnix},{Enum.GetName(typeof(Availability.Recurring), a.IsRecurring)},{i}", $"{startTime.ToString("hh:mm tt")} - {endTime.ToString("hh:mm tt")}");
             }
 
             ComponentBuilder components = new ComponentBuilder()

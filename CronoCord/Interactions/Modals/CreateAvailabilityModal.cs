@@ -37,7 +37,7 @@ namespace CronoCord.Interactions.Modals
                          customId: "availability_end_time",
                          style: TextInputStyle.Short,
                          required: true);
-            AddTextInput(label: "Recurring (N, D, W, M, Y):",
+            AddTextInput(label: "Recurring: Never|Daily|Weekly|Monthly|Yearly",
                          customId: "availability_recurring",
                          style: TextInputStyle.Short,
                          required: true,
@@ -51,7 +51,7 @@ namespace CronoCord.Interactions.Modals
             string dateStr = components.First(x => x.CustomId == "availability_date").Value;
             string startTimeStr = components.First(x => x.CustomId == "availability_start_time").Value;
             string endTimeStr = components.First(x => x.CustomId == "availability_end_time").Value;
-            string recurringStr = components.First(x => x.CustomId == "availability_recurring").Value;
+            string recurringStr = components.First(x => x.CustomId == "availability_recurring").Value.ToUpper()[0].ToString();
             DateTime? date = UtilityMethods.ParseDateTime(dateStr);
             DateTime? startTime = UtilityMethods.ParseDateTime(startTimeStr);
             DateTime? endTime = UtilityMethods.ParseDateTime(endTimeStr);
@@ -60,7 +60,7 @@ namespace CronoCord.Interactions.Modals
 
             // Find any errors in the input
             if (date == null)
-                errorMessage += $"Date: \"{dateStr}\" is in the wrong format! Use MMM DD YYYY\n";
+                errorMessage += $"Date: \"{dateStr}\" is in the wrong format! Use MMM DD YYYY. eg Feb 12 2024\n";
             if (startTime == null)
                 errorMessage += $"Start time: \"{startTimeStr}\" is in the wrong format! Use 12 hour format\n";
             if (endTime == null)

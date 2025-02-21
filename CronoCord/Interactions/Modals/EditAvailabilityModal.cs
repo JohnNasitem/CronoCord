@@ -42,7 +42,7 @@ namespace CronoCord.Interactions.Modals
                          style: TextInputStyle.Short,
                          required: true,
                          value: endTime.ToString("hh:mm tt"));
-            AddTextInput(label: "Recurring (N, D, W, M, Y):",
+            AddTextInput(label: "Recurring: Never|Daily|Weekly|Monthly|Yearly",
                          customId: "availability_recurring",
                          style: TextInputStyle.Short,
                          required: true,
@@ -65,7 +65,7 @@ namespace CronoCord.Interactions.Modals
             string dateStr = components.First(x => x.CustomId == "availability_date").Value;
             string startTimeStr = components.First(x => x.CustomId == "availability_start_time").Value;
             string endTimeStr = components.First(x => x.CustomId == "availability_end_time").Value;
-            string recurringStr = components.First(x => x.CustomId == "availability_recurring").Value;
+            string recurringStr = components.First(x => x.CustomId == "availability_recurring").Value.ToUpper()[0].ToString();
             string deleteStr = components.First(x => x.CustomId == "availability_delete").Value.ToUpper();
             DateTime? date = UtilityMethods.ParseDateTime(dateStr);
             DateTime? startTime = UtilityMethods.ParseDateTime(startTimeStr);
@@ -91,15 +91,22 @@ namespace CronoCord.Interactions.Modals
                 return;
             }
 
-            bool success = false;
+            int affectedRows = -1;
 
             // Check if user wants to delete the slot
             if (deleteStr == "Y")
             {
-                await Task.Run(() => success = DatabaseManagement.DeleteAvailability(oldAvailability));
+                await Task.Run(() => affectedRows = DatabaseManagement.DeleteAvailability(oldAvailability));
 
-                if (success)
-                    await modal.RespondAsync($"Successfully deleted the availability slot!", ephemeral: true);
+                if (affectedRows != -1)
+                {
+                    string message = $"Successfully deleted the availability slot!";
+
+                    if (affectedRows > 1)
+                        message += "\nIt seems that duplicate slots have also been deleted, if you had meant to keep 1 copy then you will need to re-add the availability slot";
+                    
+                    await modal.RespondAsync(message, ephemeral: true);
+                }
                 else
                     await modal.RespondAsync($"Something went wrong... contact <@{Program.AuthorID}>", ephemeral: true);
 
@@ -117,10 +124,15 @@ namespace CronoCord.Interactions.Modals
 
             // Convert modal input into Availability and update the entry in the database
             Availability availabilityDetails = new Availability(modal.User.Id, new DateTimeOffset(startDateTime).ToUnixTimeSeconds(), new DateTimeOffset(endDateTime).ToUnixTimeSeconds(), recurring);
-            await Task.Run(() => success = DatabaseManagement.EditAvailability(oldAvailability, availabilityDetails));
+            await Task.Run(() => affectedRows = DatabaseManagement.EditAvailability(oldAvailability, availabilityDetails));
 
-            if (success)
-                await modal.RespondAsync(embed: availabilityDetails.EditSucessEmbed(oldAvailability), ephemeral: true);
+            if (affectedRows != -1)
+            {
+                if (affectedRows == 0)
+                    await modal.RespondAsync("It seems like this availability was deleted. Use /edit-schedule to refresh the menu", ephemeral: true);
+                else
+                    await modal.RespondAsync(embed: availabilityDetails.EditSucessEmbed(oldAvailability), ephemeral: true);
+            }
             else
                 await modal.RespondAsync($"Something went wrong... contact <@{Program.AuthorID}>", ephemeral: true);
 

@@ -299,7 +299,7 @@ namespace CronoCord.Utilities
         /// <param name="oldAvailabiltiy">entry to replace</param>
         /// <param name="newAvailability">new details to use</param>
         /// <returns>sucess</returns>
-        public static bool EditAvailability(Availability oldAvailabiltiy, Availability newAvailability)
+        public static int EditAvailability(Availability oldAvailabiltiy, Availability newAvailability)
         {
             try
             {
@@ -321,10 +321,10 @@ namespace CronoCord.Utilities
                     command.Parameters.AddWithValue("@NewRecurring", Enum.GetName(typeof(Availability.Recurring), newAvailability.IsRecurring));
 
                     // Execute the query
-                    command.ExecuteNonQuery();
-                }
+                    int affectedRows = command.ExecuteNonQuery();
 
-                return true;
+                    return affectedRows;
+                }
             }
             catch (SQLiteException ex)
             {
@@ -335,7 +335,7 @@ namespace CronoCord.Utilities
                 UtilityMethods.PrettyConsoleWriteLine($"Problem occured in DatabaseManagement.EditAvailability: {ex.Message}", UtilityMethods.LogLevel.Error);
             }
 
-            return false;
+            return -1;
         }
 
 
@@ -345,7 +345,7 @@ namespace CronoCord.Utilities
         /// </summary>
         /// <param name="availabilityToDelete">entry to delete</param>
         /// <returns>success</returns>
-        public static bool DeleteAvailability(Availability availabilityToDelete)
+        public static int DeleteAvailability(Availability availabilityToDelete)
         {
             try
             {
@@ -362,9 +362,9 @@ namespace CronoCord.Utilities
 
                     // Execute the query
                     int rowsAffected = command.ExecuteNonQuery();
-                }
 
-                return true;
+                    return rowsAffected;
+                }
             }
             catch (SQLiteException ex)
             {
@@ -375,7 +375,7 @@ namespace CronoCord.Utilities
                 UtilityMethods.PrettyConsoleWriteLine($"Problem occured in DatabaseManagement.DeleteAvailability: {ex.Message}", UtilityMethods.LogLevel.Error);
             }
 
-            return false;
+            return -1;
         }
         #endregion
 
