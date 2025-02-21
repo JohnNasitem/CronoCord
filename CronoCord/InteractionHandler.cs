@@ -77,9 +77,6 @@ namespace CronoCord
         {
             switch (modal.Data.CustomId.Split(':')[0])
             {
-                case "create_event":
-                    await CreateEventModal.ModelSubmit(modal);
-                    break;
                 case "create_availability":
                     await CreateAvailabilityModal.ModelSubmit(modal);
                     break;
