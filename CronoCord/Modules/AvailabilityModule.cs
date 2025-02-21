@@ -43,7 +43,15 @@ namespace CronoCord.Modules
         [SlashCommand("add-availability-slot", "Add an availability slot to your schedule")]
         public async Task AddAvailabilitySlotCommand()
         {
-            await RespondWithModalAsync(new Interactions.Modals.CreateAvailabilityModal().Build());
+            try
+            {
+                await RespondWithModalAsync(new Interactions.Modals.CreateAvailabilityModal().Build());
+            }
+            catch (Exception ex)
+            {
+                await RespondAsync($"Something went wrong... contact <@{Program.AuthorID}>", ephemeral: true);
+                Console.WriteLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}]: Problem occured in AddAvailabilitySlotCommand(). Exception: {ex}");
+            }
         }
 
 
