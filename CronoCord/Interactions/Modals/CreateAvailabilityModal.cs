@@ -13,7 +13,6 @@ using Discord;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace CronoCord.Interactions.Modals
@@ -22,6 +21,7 @@ namespace CronoCord.Interactions.Modals
     {
         public CreateAvailabilityModal()
         {
+            // Populate modal
             Title = "Create Availability Slot";
             CustomId = "create_availability";
             AddTextInput(label: "Date (MMM DD YYYY):",
@@ -58,6 +58,7 @@ namespace CronoCord.Interactions.Modals
 
             string errorMessage = "";
 
+            // Find any errors in the input
             if (date == null)
                 errorMessage += $"Date: \"{dateStr}\" is in the wrong format! Use MMM DD YYYY\n";
             if (startTime == null)
@@ -85,6 +86,7 @@ namespace CronoCord.Interactions.Modals
 
             bool success = false;
 
+            // Convert modal input into Availability and add an entry into the database
             Availability availabilityDetails = new Availability(modal.User.Id, new DateTimeOffset(startDateTime).ToUnixTimeSeconds(), new DateTimeOffset(endDateTime).ToUnixTimeSeconds(), recurring);
             await Task.Run(() => success = DatabaseManagement.CreateAvailability(availabilityDetails));
 
