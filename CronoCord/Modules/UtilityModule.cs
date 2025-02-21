@@ -41,7 +41,7 @@ namespace CronoCord.Modules
             await RespondAsync(embed: new EmbedBuilder()
                                     .WithTitle("Bot Information")
                                     .WithDescription("This is a bot that manages schedules")
-                                    .WithColor(Color.Green)
+                                    .WithColor(Color.DarkerGrey)
                                     .AddField("Author", Program.Author, inline: true)
                                     .AddField("Version", Program.Version, inline: true)
                                     .Build());
