@@ -128,15 +128,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classes\Availability.cs" />
-    <Compile Include="Classes\Event.cs" />
     <Compile Include="InteractionHandler.cs" />
     <Compile Include="Interactions\MessageComponents\EditScheduleMessageComponent.cs" />
     <Compile Include="Interactions\Modals\EditAvailabilityModal.cs" />
     <Compile Include="Interactions\Modals\CreateAvailabilityModal.cs" />
-    <Compile Include="Interactions\Modals\CreateEventModal.cs" />
     <Compile Include="Modules\AvailabilityModule.cs" />
     <Compile Include="Modules\DatabaseModule.cs" />
-    <Compile Include="Modules\EventsModule.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\LoggingService.cs" />
