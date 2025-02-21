@@ -40,7 +40,7 @@ namespace CronoCord.Modules
         public async Task InfoCommand() =>
             await RespondAsync(embed: new EmbedBuilder()
                                     .WithTitle("Bot Information")
-                                    .WithDescription("This is a bot that manages schedules as well a events")
+                                    .WithDescription("This is a bot that manages schedules")
                                     .WithColor(Color.Green)
                                     .AddField("Author", Program.Author, inline: true)
                                     .AddField("Version", Program.Version, inline: true)
