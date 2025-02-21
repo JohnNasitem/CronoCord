@@ -23,7 +23,9 @@ namespace CronoCord.Modules
 {
     public class AvailabilityModule : InteractionModuleBase<SocketInteractionContext>
     {
+        // Random to generate colours
         private readonly static Random _rand = new Random();
+        // Font text for the schedule image
         private readonly Font COLHEADERFONT = new Font("Arial", 35);
         private readonly Font ROWHEADERFONT = new Font("Arial", 30);
 
@@ -101,6 +103,7 @@ namespace CronoCord.Modules
                     await RespondAsync($"No availabilities to edit! Use the /add-availability-slot to add one", ephemeral: true);
                 else
                 {
+                    // Generate edit availability message and send it to user
                     EditScheduleMessageComponent menuStuff = new EditScheduleMessageComponent(userSchedule, 2, 0);
                     await RespondAsync(embed: menuStuff.Embed, components: menuStuff.MessageComponent, ephemeral: true);
                 }
@@ -133,14 +136,15 @@ namespace CronoCord.Modules
                 return;
             }
 
-
+            // Filter out any availabilities dont fall within the offsetted week range and arent recurring 
+            // For the recurring availabilites only add the recurrences that do fall within the week range 
             foreach (Availability availability in unfiltered_availabilities)
             {
-                DateTime offsetedDate = DateTime.Now.AddDays(weekOffset * 7);
+                DateTime offsettedDate = DateTime.Now.AddDays(weekOffset * 7);
 
                 // Get selected week's ranges
-                long startSundayUnix = UtilityMethods.GetSundayUnixTimeStamp(true, offsetedDate);
-                long endSaturdayUnix = UtilityMethods.GetSundayUnixTimeStamp(false, offsetedDate) - 1;
+                long startSundayUnix = UtilityMethods.GetSundayUnixTimeStamp(true, offsettedDate);
+                long endSaturdayUnix = UtilityMethods.GetSundayUnixTimeStamp(false, offsettedDate) - 1;
 
                 // Include the availabilities happning this week that arent repeating
                 if (startSundayUnix <= availability.StartTimeUnix && availability.EndTimeUnix <= endSaturdayUnix)
@@ -188,7 +192,7 @@ namespace CronoCord.Modules
                             break;
                         case Availability.Recurring.M:
                             DateTime originalDateM = UtilityMethods.ToDateTime(availability.StartTimeUnix);
-                            int monthsDiff = (offsetedDate.Year - originalDateM.Year) * 12 + (offsetedDate.Month - originalDateM.Month);
+                            int monthsDiff = (offsettedDate.Year - originalDateM.Year) * 12 + (offsettedDate.Month - originalDateM.Month);
 
                             // Get the startTimeunix and endTimeUnix for this month
                             long offsetStartUnixM = new DateTimeOffset(UtilityMethods.ToDateTime(availability.StartTimeUnix).AddMonths(monthsDiff)).ToUnixTimeSeconds();
@@ -200,7 +204,7 @@ namespace CronoCord.Modules
                             break;
                         case Availability.Recurring.Y:
                             DateTime originalDateY = UtilityMethods.ToDateTime(availability.StartTimeUnix);
-                            int yearDiff = offsetedDate.Year - originalDateY.Year;
+                            int yearDiff = offsettedDate.Year - originalDateY.Year;
 
                             // Get the startTimeunix and endTimeUnix for this month
                             long offsetStartUnixY = new DateTimeOffset(UtilityMethods.ToDateTime(availability.StartTimeUnix).AddYears(yearDiff)).ToUnixTimeSeconds();
@@ -232,15 +236,16 @@ namespace CronoCord.Modules
             List<ulong> mentionedUsersID = mentionedUsers.Select(u => u.Id).ToList();
             Dictionary<ulong, SolidBrush> userColours = null;
             int backgroundWidth = 2300;
+
+            // If there are availabilities then merged overlapping slots and generate user colours
             if (availabilities.Count > 0)
             {
                 availabilities = MergeOverlappingSlots(availabilities);
                 userColours = GenerateUserColours(mentionedUsersID).Select(kvp => new KeyValuePair<ulong, SolidBrush>(kvp.Key, new SolidBrush(kvp.Value))).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-                //Does it need to be sorted?
-                availabilities.Sort((a1, a2) => a1.StartTimeUnix.CompareTo(a2.StartTimeUnix));
             }
 
-            System.Drawing.Size imageSize = new System.Drawing.Size(mentionedUsersID.Count < 2 ? backgroundWidth : backgroundWidth + 400, 2500);
+            // Create image size
+            Size imageSize = new Size(mentionedUsersID.Count < 2 ? backgroundWidth : backgroundWidth + 400, 2500);
 
             // Create schedule bitmap
             using (Bitmap bm = new Bitmap(imageSize.Width, imageSize.Height))
