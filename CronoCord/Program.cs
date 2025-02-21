@@ -52,22 +52,35 @@ namespace CronoCord
 
         public static async Task Main(string[] args)
         {
-            _serviceProvider = CreateProvider();
+            while (true)
+            {
+                try
+                {
+                    _serviceProvider = CreateProvider();
 
-            _client = _serviceProvider.GetService<DiscordSocketClient>();
+                    _client = _serviceProvider.GetService<DiscordSocketClient>();
 
-            // Here we can initialize the service that will register and execute our commands
-            await _serviceProvider.GetRequiredService<InteractionHandler>()
-                .InitializeAsync();
+                    // Here we can initialize the service that will register and execute our commands
+                    await _serviceProvider.GetRequiredService<InteractionHandler>()
+                        .InitializeAsync();
 
-            // Log in witt bot token
-            // Token is stored in (on windows) System Properties -> Environment Variables -> User variables
-            // Make sure to restart visual studio after adding a new user variable
-            await _client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("CRONOCORD_BOT_TOKEN"));
+                    // Log in witt bot token
+                    // Token is stored in (on windows) System Properties -> Environment Variables -> User variables
+                    // Make sure to restart visual studio after adding a new user variable
+                    await _client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("CRONOCORD_BOT_TOKEN"));
 
-            // Start bot and block the program until it is closed.
-            await _client.StartAsync();
-            await Task.Delay(Timeout.Infinite);
+                    // Start bot and block the program until it is closed.
+                    await _client.StartAsync();
+                    await Task.Delay(Timeout.Infinite);
+                }
+                catch (Exception ex)
+                {
+                    UtilityMethods.PrettyConsoleWriteLine($"Bot crashed: {ex.Message}", UtilityMethods.LogLevel.Critical);
+                    await Task.Delay(5000);
+                    UtilityMethods.PrettyConsoleWriteLine($"Attempting to restart", UtilityMethods.LogLevel.Info);
+                }
+            }
+            
         }
     }
 }
