@@ -51,14 +51,18 @@ namespace CronoCord.Interactions.MessageComponents
                     .WithDisabled(offset + amountToDisplay > availabilitesToDisplay.Count)
                     .WithStyle(ButtonStyle.Secondary);
 
+            // Populate embed fields and select options with the visible availabilities
             for (int i = offset; i - offset < amountToDisplay; i++)
             {
+                // Stop if no more availabilities are left to display
                 if (i >= availabilitesToDisplay.Count)
                     break;
 
+                //Convert data
                 Availability a = availabilitesToDisplay[i];
                 DateTime startTime = UtilityMethods.ToDateTime(a.StartTimeUnix);
                 DateTime endTime = UtilityMethods.ToDateTime(a.EndTimeUnix);
+
                 embedMenu.AddField($"{i + 1} - {UtilityMethods.ToUnixTimeStamp(a.StartTimeUnix, "D")}", $"{UtilityMethods.ToUnixTimeStamp(a.StartTimeUnix, "t")} - {UtilityMethods.ToUnixTimeStamp(a.EndTimeUnix, "t")}", false);
                 selectMenu.AddOption($"{i + 1} - {startTime.ToString("MMM d yyyy")}", $"{a.StartTimeUnix},{a.EndTimeUnix},{Enum.GetName(typeof(Availability.Recurring), a.IsRecurring)}", $"{startTime.ToString("hh:mm tt")} - {endTime.ToString("hh:mm tt")}");
             }
@@ -68,13 +72,17 @@ namespace CronoCord.Interactions.MessageComponents
                 .WithSelectMenu(selectMenu)
                 .WithButton(nextButton);
 
-
-
             MessageComponent = components.Build();
             Embed = embedMenu.Build();
         }
 
 
+
+        /// <summary>
+        /// Button press handler
+        /// </summary>
+        /// <param name="arg">SocketMessageComponent</param>
+        /// <returns>Task</returns>
         public static async Task ButtonPressed(SocketMessageComponent arg)
         {
             Console.WriteLine("In button press");
@@ -89,11 +97,14 @@ namespace CronoCord.Interactions.MessageComponents
 
             if (userSchedule != null)
             {
-                //await arg.DeferAsync();
+                // Move pages
                 if (userSchedule.Count != 0)
                     offset += direction == "previous" ? -amountToDisplay : amountToDisplay;
 
+                // Generate new page
                 EditScheduleMessageComponent menuStuff = new EditScheduleMessageComponent(userSchedule, amountToDisplay, offset);
+
+                // Edit original message
                 await arg.DeferAsync();
                 await arg.ModifyOriginalResponseAsync(properties =>
                 {
