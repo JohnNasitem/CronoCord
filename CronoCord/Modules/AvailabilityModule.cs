@@ -255,15 +255,12 @@ namespace CronoCord.Modules
         private void GenerateScheduleImage(List<IUser> mentionedUsers, List<Availability> availabilities, int weekOffset, bool showOverlapCount)
         {
             List<ulong> mentionedUsersID = mentionedUsers.Select(u => u.Id).ToList();
-            Dictionary<ulong, SolidBrush> userColours = null;
+            Dictionary<ulong, SolidBrush> userColours = GenerateUserColours(mentionedUsersID).Select(kvp => new KeyValuePair<ulong, SolidBrush>(kvp.Key, new SolidBrush(kvp.Value))).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             int backgroundWidth = 2300;
 
-            // If there are availabilities then merged overlapping slots and generate user colours
+            // If there are availabilities then merged overlapping slots
             if (availabilities.Count > 0)
-            {
                 availabilities = MergeOverlappingSlots(availabilities);
-                userColours = GenerateUserColours(mentionedUsersID).Select(kvp => new KeyValuePair<ulong, SolidBrush>(kvp.Key, new SolidBrush(kvp.Value))).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-            }
 
             // Create image size
             Size imageSize = new Size(mentionedUsersID.Count < 2 ? backgroundWidth : backgroundWidth + 400, 2500);
