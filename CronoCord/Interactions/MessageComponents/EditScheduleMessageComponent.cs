@@ -85,7 +85,6 @@ namespace CronoCord.Interactions.MessageComponents
         /// <returns>Task</returns>
         public static async Task ButtonPressed(SocketMessageComponent arg)
         {
-            Console.WriteLine("In button press");
             string[] buttonData = arg.Data.CustomId.Split(':')[1].Split(',');
             string direction = buttonData[0];
             int amountToDisplay = int.Parse(buttonData[1]);

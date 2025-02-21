@@ -395,7 +395,6 @@ namespace CronoCord.Utilities
 
                     // Execute the query
                     int rowsAffected = command.ExecuteNonQuery();
-                    Console.WriteLine($"{rowsAffected} row(s) deleted.");
                 }
 
                 return true;
