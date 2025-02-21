@@ -10,10 +10,6 @@
 using Discord;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CronoCord.Classes
 {
@@ -51,7 +47,7 @@ namespace CronoCord.Classes
         }
 
 
-        private Dictionary<Recurring, string> _expandedRecurring = new Dictionary<Recurring, string>()
+        private readonly Dictionary<Recurring, string> _expandedRecurring = new Dictionary<Recurring, string>()
         {
             {Recurring.N, "Never" },
             {Recurring.D, "Daily" },
@@ -91,7 +87,7 @@ namespace CronoCord.Classes
                                      $"Start Time: {UtilityMethods.ToUnixTimeStamp(StartTimeUnix, "t")}\n" +
                                      $"End Time: {UtilityMethods.ToUnixTimeStamp(EndTimeUnix, "t")}\n" +
                                      $"Recurring: {_expandedRecurring[IsRecurring]}")
-                    .WithColor(Discord.Color.Green)
+                    .WithColor(Color.Green)
                     .AddField("Other Commands", "Use /edit-schedule to edit your availability slots\nUse /view-schedule to view your schedule", false)
                     .Build();
             return embed;
@@ -112,7 +108,7 @@ namespace CronoCord.Classes
                                      $"Start Time: {UtilityMethods.ToUnixTimeStamp(oldAvailability.StartTimeUnix, "t")} -> {UtilityMethods.ToUnixTimeStamp(StartTimeUnix, "t")}\n" +
                                      $"End Time: {UtilityMethods.ToUnixTimeStamp(oldAvailability.EndTimeUnix, "t")} -> {UtilityMethods.ToUnixTimeStamp(EndTimeUnix, "t")}\n" +
                                      $"Recurring: {_expandedRecurring[oldAvailability.IsRecurring]} -> {_expandedRecurring[IsRecurring]}")
-                    .WithColor(Discord.Color.Green)
+                    .WithColor(Color.Green)
                     .Build();
             return embed;
         }
