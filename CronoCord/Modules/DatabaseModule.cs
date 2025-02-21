@@ -7,17 +7,9 @@
 
 
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Discord.WebSocket;
 using System.Threading.Tasks;
-using Discord;
 using Discord.Interactions;
 using CronoCord.Utilities;
-using System.Runtime.InteropServices;
-
 namespace CronoCord.Modules
 {
     public class DatabaseModule : InteractionModuleBase<SocketInteractionContext>
