@@ -51,6 +51,16 @@ namespace CronoCord.Classes
         }
 
 
+        private Dictionary<Recurring, string> _expandedRecurring = new Dictionary<Recurring, string>()
+        {
+            {Recurring.N, "Never" },
+            {Recurring.D, "Daily" },
+            {Recurring.W, "Weekly" },
+            {Recurring.M, "Monthly" },
+            {Recurring.Y, "Yearly" }
+        };
+
+
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Availability"/> class.
@@ -75,23 +85,34 @@ namespace CronoCord.Classes
         /// <returns>Discord embed</returns>
         public Embed CreateSucessEmbed()
         {
-            Dictionary<Recurring, string> expandedRecurring = new Dictionary<Recurring, string>()
-            {
-                {Recurring.N, "Never" },
-                {Recurring.D, "Daily" },
-                {Recurring.W, "Weekly" },
-                {Recurring.M, "Monthly" },
-                {Recurring.Y, "Yearly" }
-            };
-
             Embed embed = new EmbedBuilder()
                     .WithTitle($"Successfully created availability slot!")
                     .WithDescription($"Date: {UtilityMethods.ToUnixTimeStamp(StartTimeUnix, "D")}\n" +
                                      $"Start Time: {UtilityMethods.ToUnixTimeStamp(StartTimeUnix, "t")}\n" +
                                      $"End Time: {UtilityMethods.ToUnixTimeStamp(EndTimeUnix, "t")}\n" +
-                                     $"Recurring: {expandedRecurring[IsRecurring]}")
+                                     $"Recurring: {_expandedRecurring[IsRecurring]}")
                     .WithColor(Discord.Color.Green)
                     .AddField("Other Commands", "Use /edit-schedule to edit your availability slots\nUse /view-schedule to view your schedule", false)
+                    .Build();
+            return embed;
+        }
+
+
+
+
+        /// <summary>
+        /// Create an embed displaying before and after
+        /// </summary>
+        /// <returns>Discord embed</returns>
+        public Embed EditSucessEmbed(Availability oldAvailability)
+        {
+            Embed embed = new EmbedBuilder()
+                    .WithTitle($"Successfully editted availability slot!")
+                    .WithDescription($"Date: {UtilityMethods.ToUnixTimeStamp(oldAvailability.StartTimeUnix, "D")} -> {UtilityMethods.ToUnixTimeStamp(StartTimeUnix, "D")}\n" +
+                                     $"Start Time: {UtilityMethods.ToUnixTimeStamp(oldAvailability.StartTimeUnix, "t")} -> {UtilityMethods.ToUnixTimeStamp(StartTimeUnix, "t")}\n" +
+                                     $"End Time: {UtilityMethods.ToUnixTimeStamp(oldAvailability.EndTimeUnix, "t")} -> {UtilityMethods.ToUnixTimeStamp(EndTimeUnix, "t")}\n" +
+                                     $"Recurring: {_expandedRecurring[oldAvailability.IsRecurring]} -> {_expandedRecurring[IsRecurring]}")
+                    .WithColor(Discord.Color.Green)
                     .Build();
             return embed;
         }
