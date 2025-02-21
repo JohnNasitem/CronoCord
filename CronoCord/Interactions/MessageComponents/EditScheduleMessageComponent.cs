@@ -1,12 +1,15 @@
-﻿using System;
+﻿//***********************************************************************************
+//Program: EditScheduleMessageComponent.cs
+//Description: Edit availability message
+//Date: Feb 21, 2025
+//Author: John Nasitem
+//***********************************************************************************
+
+
+
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data.Entity;
-using System.Linq;
-using System.Runtime.Remoting.Contexts;
-using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using CronoCord.Classes;
 using CronoCord.Utilities;
 using Discord;
