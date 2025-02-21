@@ -347,15 +347,13 @@ namespace CronoCord.Utilities
                     command.Parameters.AddWithValue("@EndTimeUnix", oldAvailabiltiy.EndTimeUnix);
                     command.Parameters.AddWithValue("@Recurring", Enum.GetName(typeof(Availability.Recurring), oldAvailabiltiy.IsRecurring));
 
-
                     // New values
                     command.Parameters.AddWithValue("@NewStartTimeUnix", newAvailability.StartTimeUnix);
                     command.Parameters.AddWithValue("@NewEndTimeUnix", newAvailability.EndTimeUnix);
                     command.Parameters.AddWithValue("@NewRecurring", Enum.GetName(typeof(Availability.Recurring), newAvailability.IsRecurring));
 
                     // Execute the query
-                    int rowsAffected = command.ExecuteNonQuery();
-                    Console.WriteLine($"{rowsAffected} row(s) updated.");
+                    command.ExecuteNonQuery();
                 }
 
                 return true;
@@ -367,6 +365,47 @@ namespace CronoCord.Utilities
             catch (Exception ex)
             {
                 Console.WriteLine($"Problem occured in DatabaseManagement.EditAvailability: {ex.Message}");
+            }
+
+            return false;
+        }
+
+
+
+        /// <summary>
+        /// Deletes an entry from the availability table
+        /// </summary>
+        /// <param name="availabilityToDelete">entry to delete</param>
+        /// <returns>success</returns>
+        public static bool DeleteAvailability(Availability availabilityToDelete)
+        {
+            try
+            {
+                using (var command = _connection.CreateCommand())
+                {
+                    command.CommandText = "DELETE FROM availabilities " +
+                                          "WHERE UserID = @UserID AND StartTimeUnix = @StartTimeUnix AND EndTimeUnix = @EndTimeUnix AND Recurring = @Recurring;";
+
+                    // Add parameters
+                    command.Parameters.AddWithValue("@UserID", availabilityToDelete.UserID);
+                    command.Parameters.AddWithValue("@StartTimeUnix", availabilityToDelete.StartTimeUnix);
+                    command.Parameters.AddWithValue("@EndTimeUnix", availabilityToDelete.EndTimeUnix);
+                    command.Parameters.AddWithValue("@Recurring", Enum.GetName(typeof(Availability.Recurring), availabilityToDelete.IsRecurring));
+
+                    // Execute the query
+                    int rowsAffected = command.ExecuteNonQuery();
+                    Console.WriteLine($"{rowsAffected} row(s) deleted.");
+                }
+
+                return true;
+            }
+            catch (SQLiteException ex)
+            {
+                Console.WriteLine($"SQLite Exception - Error Code: {(_sqliteResultCodes.ContainsKey(ex.ErrorCode) ? _sqliteResultCodes[ex.ErrorCode] : "N/A")} - Error: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Problem occured in DatabaseManagement.DeleteAvailability: {ex.Message}");
             }
 
             return false;
