@@ -253,7 +253,7 @@ namespace CronoCord.Utilities
                     command.Parameters.AddWithValue("@UserID", availabilityDetails.UserID);
                     command.Parameters.AddWithValue("@StartTimeUnix", availabilityDetails.StartTimeUnix);
                     command.Parameters.AddWithValue("@EndTimeUnix", availabilityDetails.EndTimeUnix);
-                    command.Parameters.AddWithValue("@Recurring", availabilityDetails.IsRecurring);
+                    command.Parameters.AddWithValue("@Recurring", Enum.GetName(typeof(Availability.Recurring), availabilityDetails.IsRecurring));
 
                     // Execute the query
                     command.ExecuteNonQuery();
@@ -337,8 +337,8 @@ namespace CronoCord.Utilities
             {
                 using (SQLiteCommand command = _connection.CreateCommand())
                 {
-                    command.CommandText = "UPDATE availabilities" +
-                                          "SET StartTimeUnix = @NewStartTimeUnix, EndTimeUnix = @NewEndTimeUnix, Recurring = @NewRecurring" +
+                    command.CommandText = "UPDATE availabilities " +
+                                          "SET StartTimeUnix = @NewStartTimeUnix, EndTimeUnix = @NewEndTimeUnix, Recurring = @NewRecurring " +
                                           "WHERE UserID = @UserID AND StartTimeUnix = @StartTimeUnix AND EndTimeUnix = @EndTimeUnix AND Recurring = @Recurring";
 
                     // Old values
