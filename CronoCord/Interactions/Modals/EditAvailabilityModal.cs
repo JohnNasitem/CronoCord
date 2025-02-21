@@ -13,9 +13,7 @@ using Discord;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Discord.Interactions;
 
 namespace CronoCord.Interactions.Modals
 {
@@ -26,6 +24,7 @@ namespace CronoCord.Interactions.Modals
             DateTime startTime = UtilityMethods.ToDateTime(availabilityToEdit.StartTimeUnix);
             DateTime endTime = UtilityMethods.ToDateTime(availabilityToEdit.EndTimeUnix);
 
+            // Prepopulate fields with old data
             Title = "Edit Availability Slot";
             CustomId = $"edit_availability:{availabilityToEdit.StartTimeUnix},{availabilityToEdit.EndTimeUnix},{Enum.GetName(typeof(Availability.Recurring), availabilityToEdit.IsRecurring)}";
             AddTextInput(label: "Date (MMM DD YYYY):",
@@ -74,6 +73,7 @@ namespace CronoCord.Interactions.Modals
 
             string errorMessage = "";
 
+            // Find any errors in the input
             if (date == null)
                 errorMessage += $"Date: \"{dateStr}\" is in the wrong format! Use MMM DD YYYY\n";
             if (startTime == null)
@@ -93,6 +93,7 @@ namespace CronoCord.Interactions.Modals
 
             bool success = false;
 
+            // Check if user wants to delete the slot
             if (deleteStr == "Y")
             {
                 await Task.Run(() => success = DatabaseManagement.DeleteAvailability(oldAvailability));
@@ -114,6 +115,7 @@ namespace CronoCord.Interactions.Modals
                 return;
             }
 
+            // Convert modal input into Availability and update the entry in the database
             Availability availabilityDetails = new Availability(modal.User.Id, new DateTimeOffset(startDateTime).ToUnixTimeSeconds(), new DateTimeOffset(endDateTime).ToUnixTimeSeconds(), recurring);
             await Task.Run(() => success = DatabaseManagement.EditAvailability(oldAvailability, availabilityDetails));
 
