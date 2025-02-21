@@ -8,13 +8,15 @@
 
 
 
-using CronoCord.Modules;
+using CronoCord.Interactions.Modals;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using System;
+using System.ComponentModel;
 using System.Reflection;
 using System.Threading.Tasks;
+using CronoCord.Classes;
 
 namespace CronoCord
 {
@@ -37,6 +39,8 @@ namespace CronoCord
             _client.Ready += ReadyAsync;
             // Process modal submissions
             _client.ModalSubmitted += ModalSubmitted;
+            // Process select selections
+            _client.SelectMenuExecuted += SelectExecuted;
             // Add the public modules that inherit InteractionModuleBase<T> to the InteractionService
             await _handler.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
             // Process the InteractionCreated payloads to execute Interactions commands
@@ -45,15 +49,31 @@ namespace CronoCord
             _handler.InteractionExecuted += HandleInteractionExecute;
         }
 
+
+        private async Task SelectExecuted(SocketMessageComponent arg)
+        {
+            switch (arg.Data.CustomId)
+            {
+                case "edit-schedule-menu":
+                    string[] selectData = string.Join("", arg.Data.Values).Split(',');
+                    Availability availability = new Availability(arg.User.Id, long.Parse(selectData[0]), long.Parse(selectData[1]), (Availability.Recurring)Enum.Parse(typeof(Availability.Recurring), selectData[2]));
+                    await arg.RespondWithModalAsync(new EditAvailabilityModal(availability).Build());
+                    break;
+            }
+        }
+
         private async Task ModalSubmitted(SocketModal modal)
         {
-            switch (modal.Data.CustomId)
+            switch (modal.Data.CustomId.Split(':')[0])
             {
                 case "create_event":
                     await Interactions.Modals.CreateEventModal.ModelSubmit(modal);
                     break;
                 case "create_availability":
                     await Interactions.Modals.CreateAvailabilityModal.ModelSubmit(modal);
+                    break;
+                case "edit_availability":
+                    await Interactions.Modals.EditAvailabilityModal.ModelSubmit(modal);
                     break;
             }
         }
