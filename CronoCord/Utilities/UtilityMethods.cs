@@ -9,10 +9,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace CronoCord
 {
@@ -182,6 +179,52 @@ namespace CronoCord
         public static DateTime ToDateTime(long unixTimeStamp)
         {
             return DateTimeOffset.FromUnixTimeSeconds(unixTimeStamp).DateTime.ToLocalTime();
+        }
+
+
+
+        /// <summary>
+        /// Add a console message with a time stamp and colours
+        /// </summary>
+        /// <param name="message">message to send</param>
+        /// <param name="logLevel">Log level</param>
+        public static void PrettyConsoleWriteLine(string message, LogLevel logLevel)
+        {
+            Dictionary<LogLevel, ConsoleColor> logLevelColors = new Dictionary<LogLevel, ConsoleColor>
+            {
+                { LogLevel.Info, ConsoleColor.Green },
+                { LogLevel.Warning, ConsoleColor.Yellow },
+                { LogLevel.Error, ConsoleColor.Red },
+                { LogLevel.Debug, ConsoleColor.Cyan },
+                { LogLevel.Trace, ConsoleColor.Magenta },
+                { LogLevel.Critical, ConsoleColor.White },
+                { LogLevel.Success, ConsoleColor.DarkGreen },
+                { LogLevel.SystemMessage, ConsoleColor.Blue }
+            };
+
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.Write($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}]");
+            Console.ResetColor();
+            Console.Write(" - ");
+            Console.ForegroundColor = logLevelColors[logLevel];
+            Console.WriteLine($"{Enum.GetName(typeof(LogLevel), logLevel)}: {message}");
+        }
+
+
+
+        /// <summary>
+        /// Log level for PrettyConsoleWriteLine()
+        /// </summary>
+        public enum LogLevel
+        {
+            Info,
+            Warning,
+            Error,
+            Debug,
+            Trace,
+            Critical,
+            Success,
+            SystemMessage
         }
     }
 }
