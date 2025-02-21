@@ -23,7 +23,7 @@ namespace CronoCord.Modules
 {
     public class AvailabilityModule : InteractionModuleBase<SocketInteractionContext>
     {
-        private static Random _rand = new Random();
+        private readonly static Random _rand = new Random();
         private readonly Font COLHEADERFONT = new Font("Arial", 35);
         private readonly Font ROWHEADERFONT = new Font("Arial", 30);
 
@@ -385,7 +385,7 @@ namespace CronoCord.Modules
             // Generate unique colours for each user
             foreach (ulong userID in userIDs)
             {
-                System.Drawing.Color possibleColour = System.Drawing.Color.Empty;
+                System.Drawing.Color possibleColour;
                 do possibleColour = GenerateColour();
                 while (userColours.ContainsValue(possibleColour));
                 userColours.Add(userID, possibleColour);
