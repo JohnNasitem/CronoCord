@@ -249,7 +249,6 @@ namespace CronoCord.Utilities
                     command.CommandText = "INSERT INTO availabilities(UserID, StartTimeUnix, EndTimeUnix, Recurring) " +
                                           "VALUES(@UserID, @StartTimeUnix, @EndTimeUnix, @Recurring)";
 
-
                     // Add parameters
                     command.Parameters.AddWithValue("@UserID", availabilityDetails.UserID);
                     command.Parameters.AddWithValue("@StartTimeUnix", availabilityDetails.StartTimeUnix);
@@ -268,7 +267,7 @@ namespace CronoCord.Utilities
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Problem occured in DatabaseManagement.ResetTable: {ex.Message}");
+                Console.WriteLine($"Problem occured in DatabaseManagement.CreateAvailability: {ex.Message}");
             }
 
             return false;
@@ -318,11 +317,59 @@ namespace CronoCord.Utilities
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Problem occured in DatabaseManagement.GetEvents: {ex.Message}");
+                Console.WriteLine($"Problem occured in DatabaseManagement.GetAvailabilites: {ex.Message}");
                 return null;
             }
 
             return availabilities;
+        }
+
+
+        /// <summary>
+        /// Edit an existing entry in the availability table
+        /// </summary>
+        /// <param name="oldAvailabiltiy">entry to replace</param>
+        /// <param name="newAvailability">new details to use</param>
+        /// <returns>sucess</returns>
+        public static bool EditAvailability(Availability oldAvailabiltiy, Availability newAvailability)
+        {
+            try
+            {
+                using (SQLiteCommand command = _connection.CreateCommand())
+                {
+                    command.CommandText = "UPDATE availabilities" +
+                                          "SET StartTimeUnix = @NewStartTimeUnix, EndTimeUnix = @NewEndTimeUnix, Recurring = @NewRecurring" +
+                                          "WHERE UserID = @UserID AND StartTimeUnix = @StartTimeUnix AND EndTimeUnix = @EndTimeUnix AND Recurring = @Recurring";
+
+                    // Old values
+                    command.Parameters.AddWithValue("@UserID", oldAvailabiltiy.UserID);
+                    command.Parameters.AddWithValue("@StartTimeUnix", oldAvailabiltiy.StartTimeUnix);
+                    command.Parameters.AddWithValue("@EndTimeUnix", oldAvailabiltiy.EndTimeUnix);
+                    command.Parameters.AddWithValue("@Recurring", Enum.GetName(typeof(Availability.Recurring), oldAvailabiltiy.IsRecurring));
+
+
+                    // New values
+                    command.Parameters.AddWithValue("@NewStartTimeUnix", newAvailability.StartTimeUnix);
+                    command.Parameters.AddWithValue("@NewEndTimeUnix", newAvailability.EndTimeUnix);
+                    command.Parameters.AddWithValue("@NewRecurring", Enum.GetName(typeof(Availability.Recurring), newAvailability.IsRecurring));
+
+                    // Execute the query
+                    int rowsAffected = command.ExecuteNonQuery();
+                    Console.WriteLine($"{rowsAffected} row(s) updated.");
+                }
+
+                return true;
+            }
+            catch (SQLiteException ex)
+            {
+                Console.WriteLine($"SQLite Exception - Error Code: {(_sqliteResultCodes.ContainsKey(ex.ErrorCode) ? _sqliteResultCodes[ex.ErrorCode] : "N/A")} - Error: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Problem occured in DatabaseManagement.EditAvailability: {ex.Message}");
+            }
+
+            return false;
         }
         #endregion
 
