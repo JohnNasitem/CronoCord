@@ -160,38 +160,6 @@ namespace CronoCord.Utilities
         {
             try
             {
-                if (table == DatabaseTables.Events || table == DatabaseTables.All)
-                {
-                    // Drop table
-                    using (SQLiteCommand command = _connection.CreateCommand())
-                    {
-                        command.CommandText = "DROP TABLE IF EXISTS events";
-                        command.ExecuteNonQuery();
-                    }
-                    UtilityMethods.PrettyConsoleWriteLine("Dropped events table", UtilityMethods.LogLevel.Info);
-
-                    // Create table
-                    using (SQLiteCommand command = _connection.CreateCommand())
-                    {
-                        command.CommandText = @"CREATE TABLE IF NOT EXISTS events(
-                                                ID INTEGER PRIMARY KEY AUTOINCREMENT, 
-                                                CreatorID INTEGER,
-                                                Name TEXT NOT NULL,
-                                                Description TEXT NOT NULL,
-                                                StartTimeUnix INTEGER NOT NULL,
-                                                EndTimeUnix INTEGER NOT NULL,
-                                                Status TEXT NOT NULL,
-                                                ChannelID INTEGER NOT NULL,
-                                                AlreadyRemindedOwner INTEGER NOT NULL,
-                                                AlreadyRemindedParticipants INTEGER NOT NULL,
-                                                AlreadyAnnounced INTEGER NOT NULL
-                                                )";
-                        command.ExecuteNonQuery();
-                    }
-                    UtilityMethods.PrettyConsoleWriteLine("Created events table", UtilityMethods.LogLevel.Info);
-                }
-
-
                 if (table == DatabaseTables.Availabilities || table == DatabaseTables.All)
                 {
                     // Drop table
@@ -414,105 +382,6 @@ namespace CronoCord.Utilities
 
 
 
-        #region Events
-        /// <summary>
-        /// Create a new entry in the events table
-        /// </summary>
-        /// <param name="event">Event ot add to events table</param>
-        public static bool CreateEvent(Event eventToAdd)
-        {
-            try
-            {
-                using (SQLiteCommand command = _connection.CreateCommand())
-                {
-                    command.CommandText = "INSERT INTO events (CreatorID, Name, Description, StartTimeUnix, EndTimeUnix, Status, ChannelID, AlreadyRemindedOwner, AlreadyRemindedParticipants, AlreadyAnnounced) " +
-                                          "VALUES (@CreatorID, @Name, @Description, @StartTimeUnix, @EndTimeUnix, @Status, @ChannelID, @AlreadyRemindedOwner, @AlreadyRemindedParticipants, @AlreadyAnnounced)";
-
-                    // Add parameters
-                    command.Parameters.AddWithValue("@CreatorID", eventToAdd.CreatorID);
-                    command.Parameters.AddWithValue("@Name", eventToAdd.Name);
-                    command.Parameters.AddWithValue("@Description", eventToAdd.Description);
-                    command.Parameters.AddWithValue("@StartTimeUnix", eventToAdd.StartTimeUnix);
-                    command.Parameters.AddWithValue("@EndTimeUnix", eventToAdd.EndTimeUnix);
-                    command.Parameters.AddWithValue("@Status", eventToAdd.Status);
-                    command.Parameters.AddWithValue("@ChannelID", eventToAdd.ChannelID);
-                    command.Parameters.AddWithValue("@AlreadyRemindedOwner", eventToAdd.AlreadyRemindedOwner);
-                    command.Parameters.AddWithValue("@AlreadyRemindedParticipants", eventToAdd.AlreadyRemindedParticipants);
-                    command.Parameters.AddWithValue("@AlreadyAnnounced", eventToAdd.AlreadyAnnounced);
-
-                    // Execute the query
-                    command.ExecuteNonQuery();
-                }
-
-                return true;
-            }
-            catch (SQLiteException ex)
-            {
-                LogSQLiteException(ex);
-            }
-            catch (Exception ex)
-            {
-                UtilityMethods.PrettyConsoleWriteLine($"Problem occured in DatabaseManagement.CreateEvent: {ex.Message}", UtilityMethods.LogLevel.Error);
-            }
-
-            return false;
-        }
-
-
-
-        /// <summary>
-        /// Get all events
-        /// </summary>
-        /// <returns>List of events</returns>
-        public static List<Event> GetEvents()
-        {
-            List<Event> events = new List<Event>();
-
-            try
-            {
-                using (SQLiteCommand command = _connection.CreateCommand())
-                {
-                    command.CommandText = "SELECT * from events";
-
-                    // Execute the query
-                    using (SQLiteDataReader reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            events.Add(new Event(
-                                creatorId: ulong.Parse(reader["CreatorID"].ToString()),
-                                name: reader["Name"].ToString(),
-                                description: reader["Description"].ToString(),
-                                startTimeUnix: long.Parse(reader["StartTimeUnix"].ToString()),
-                                endTimeUnix: long.Parse(reader["EndTimeUnix"].ToString()),
-                                status: (Event.EventsStatuses)Enum.Parse(typeof(Event.EventsStatuses), reader["Status"].ToString()),
-                                channelId: ulong.Parse(reader["ChannelID"].ToString()),
-                                alreadyRemindedOwner: Convert.ToBoolean(reader["AlreadyRemindedOwner"]),
-                                alreadyRemindedParticipants: Convert.ToBoolean(reader["AlreadyRemindedParticipants"]),
-                                alreadyAnnounced: Convert.ToBoolean(reader["AlreadyAnnounced"])
-                            ));
-                        }
-                    }
-                }
-            }
-            catch (SQLiteException ex)
-            {
-                LogSQLiteException(ex);
-                return null;
-            }
-            catch (Exception ex)
-            {
-                UtilityMethods.PrettyConsoleWriteLine($"Problem occured in DatabaseManagement.GetEvents: {ex.Message}", UtilityMethods.LogLevel.Error);
-                return null;
-            }
-
-            return events;
-        }
-        #endregion
-
-
-
-
         /// <summary>
         /// Log SQLiteExceptions
         /// </summary>
@@ -530,7 +399,6 @@ namespace CronoCord.Utilities
         public enum DatabaseTables
         {
             All,
-            Events,
             Availabilities
         }
     }
