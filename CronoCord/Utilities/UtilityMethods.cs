@@ -207,7 +207,10 @@ namespace CronoCord
             Console.ResetColor();
             Console.Write(" - ");
             Console.ForegroundColor = logLevelColors[logLevel];
+            if (logLevel == LogLevel.Critical)
+                Console.BackgroundColor = ConsoleColor.Red;
             Console.WriteLine($"{Enum.GetName(typeof(LogLevel), logLevel)}: {message}");
+            Console.ResetColor();
         }
 
 
