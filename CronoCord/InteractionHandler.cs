@@ -99,11 +99,11 @@ namespace CronoCord
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error registering commands globally: {ex.Message}");
-                Console.WriteLine(ex.StackTrace);
+                UtilityMethods.PrettyConsoleWriteLine($"Error registering commands globally: {ex.Message}", UtilityMethods.LogLevel.Error);
+                UtilityMethods.PrettyConsoleWriteLine(ex.StackTrace, UtilityMethods.LogLevel.Trace);
             }
 
-            Console.WriteLine($"{_client.CurrentUser} is connected!");
+            UtilityMethods.PrettyConsoleWriteLine($"{_client.CurrentUser} is connected!", UtilityMethods.LogLevel.SystemMessage);
         }
 
         private async Task HandleInteraction(SocketInteraction interaction)
