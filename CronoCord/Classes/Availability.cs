@@ -154,6 +154,10 @@ namespace CronoCord.Classes
 
 
 
+        /// <summary>
+        /// Returns a string that represents the current object
+        /// </summary>
+        /// <returns>a string that represents the current object</returns>
         public override string ToString()
         {
             return $"UserID: {UserID} - StartTimeUnix: {StartTimeUnix} - EndTimeUnix: {EndTimeUnix} - Recurring: {Enum.GetName(typeof(Recurring), IsRecurring)}";
