@@ -10,10 +10,6 @@ using CronoCord.Classes;
 using CronoCord.Utilities;
 using Discord.WebSocket;
 using Discord;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace CronoCord.Interactions.Modals
 {

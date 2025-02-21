@@ -7,9 +7,6 @@
 
 
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using CronoCord.Classes;
 using CronoCord.Utilities;
 using Discord;

@@ -7,16 +7,8 @@
 
 
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CronoCord.Modules;
 using System.Data.SQLite;
 using CronoCord.Classes;
-using Discord;
 
 namespace CronoCord.Utilities
 {

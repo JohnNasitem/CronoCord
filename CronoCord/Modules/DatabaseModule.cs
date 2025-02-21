@@ -7,7 +7,6 @@
 
 
 
-using System.Threading.Tasks;
 using Discord.Interactions;
 using CronoCord.Utilities;
 namespace CronoCord.Modules

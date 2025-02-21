@@ -8,8 +8,6 @@
 
 
 using Discord;
-using System;
-using System.Collections.Generic;
 
 namespace CronoCord.Classes
 {
