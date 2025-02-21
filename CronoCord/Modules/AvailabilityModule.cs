@@ -13,19 +13,10 @@ using System.Linq;
 using Discord.Interactions;
 using Discord;
 using System.Threading.Tasks;
-using Discord.WebSocket;
-using System.Reflection;
 using CronoCord.Utilities;
 using CronoCord.Classes;
 using System.Text.RegularExpressions;
-using System.Windows;
-using System.IO;
 using System.Drawing;
-using System.ComponentModel;
-using System.Reactive;
-using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.ProgressBar;
-using static CronoCord.Classes.Availability;
 using CronoCord.Interactions.MessageComponents;
 
 namespace CronoCord.Modules
@@ -42,6 +33,11 @@ namespace CronoCord.Modules
         public AvailabilityModule() { }
 
 
+
+        /// <summary>
+        /// Adds a new availability slot
+        /// </summary>
+        /// <returns></returns>
         [SlashCommand("add-availability-slot", "Add an availability slot to your schedule")]
         public async Task AddAvailabilitySlotCommand()
         {
@@ -49,6 +45,14 @@ namespace CronoCord.Modules
         }
 
 
+
+        /// <summary>
+        /// Views the availability slots of the specified users
+        /// </summary>
+        /// <param name="usersStr">Users to view</param>
+        /// <param name="weekOffset">Offset from current week</param>
+        /// <param name="showOverlapCount">should overlap count be shown</param>
+        /// <returns></returns>
         [SlashCommand("view-schedule", "View schedules")]
         public async Task ViewScheduleCommand(
             [Summary("users", "The user whose schedule you want to view")] string usersStr = "",
@@ -80,6 +84,10 @@ namespace CronoCord.Modules
 
 
 
+        /// <summary>
+        /// Edits the users schedule
+        /// </summary>
+        /// <returns></returns>
         [SlashCommand("edit-schedule", "Edit your schedule availabilities")]
         public async Task EditScheduleCommand()
         {
