@@ -26,6 +26,7 @@ using System.Reactive;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.ProgressBar;
 using static CronoCord.Classes.Availability;
+using CronoCord.Interactions.MessageComponents;
 
 namespace CronoCord.Modules
 {
@@ -91,33 +92,12 @@ namespace CronoCord.Modules
                 if (userSchedule.Count == 0)
                     await RespondAsync($"No availabilities to edit! Use the /add-availability-slot to add one", ephemeral: true);
                 else
-                    await RespondAsync(embed: GenerateEditScheduleEmbed(userSchedule, 2, 0), ephemeral: true);
+                {
+                    EditScheduleMessageComponent menuStuff = new EditScheduleMessageComponent(userSchedule, 2, 0);
+                    await RespondAsync(embed: menuStuff.Embed, components: menuStuff.MessageComponent, ephemeral: true);
+                }
              else
                     await RespondAsync($"Something went wrong... contact <@{Program.AuthorID}>", ephemeral: true);
-        }
-
-
-
-        private Embed GenerateEditScheduleEmbed(List<Availability> availabilitesToDisplay, int amountToDisplay, int offset)
-        {
-            if (amountToDisplay > 25)
-                throw new ArgumentException("amountToDisplay cannot be greater than 25 due to discord limits");
-
-            EmbedBuilder embedMenu = new EmbedBuilder()
-                    .WithTitle($"Edit Availability Slots")
-                    .WithDescription("Select the availability slot to edit using the drop down menu")
-                    .WithColor(Discord.Color.Gold);
-
-            for (int i = offset; i - offset < amountToDisplay; i++)
-            {
-                if (i >= availabilitesToDisplay.Count)
-                    break;
-
-                Availability a = availabilitesToDisplay[i];
-                embedMenu.AddField($"{i + 1} - {UtilityMethods.ToUnixTimeStamp(a.StartTimeUnix, "D")}", $"{UtilityMethods.ToUnixTimeStamp(a.StartTimeUnix, "t")} - {UtilityMethods.ToUnixTimeStamp(a.EndTimeUnix, "t")}", false);
-            }
-
-            return embedMenu.Build();
         }
 
 
