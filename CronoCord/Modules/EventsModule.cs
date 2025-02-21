@@ -21,46 +21,46 @@ namespace CronoCord.Modules
 {
     public class EventsModule : InteractionModuleBase<SocketInteractionContext>
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EventsModule"/>
-        /// </summary>
-        public EventsModule() { }
+        ///// <summary>
+        ///// Initializes a new instance of the <see cref="EventsModule"/>
+        ///// </summary>
+        //public EventsModule() { }
 
 
-        [SlashCommand("create-event", "Create an event")]
-        [DefaultMemberPermissionsAttribute(GuildPermission.ManageEvents)]
-        public async Task CreateEventCommand()
-        {
-            await RespondWithModalAsync(new Interactions.Modals.CreateEventModal().Build());
-        }
+        //[SlashCommand("create-event", "Create an event")]
+        //[DefaultMemberPermissionsAttribute(GuildPermission.ManageEvents)]
+        //public async Task CreateEventCommand()
+        //{
+        //    await RespondWithModalAsync(new Interactions.Modals.CreateEventModal().Build());
+        //}
 
 
-        [SlashCommand("view-events", "View all events")]
-        public async Task ViewEventsCommand()
-        {
-            List<Classes.Event> events = null;
-            await Task.Run(() => events = DatabaseManagement.GetEvents());
+        //[SlashCommand("view-events", "View all events")]
+        //public async Task ViewEventsCommand()
+        //{
+        //    List<Classes.Event> events = null;
+        //    await Task.Run(() => events = DatabaseManagement.GetEvents());
 
-            if (events == null)
-            {
-                await RespondAsync($"Something went wrong... contact <@{Program.AuthorID}>", ephemeral: true);
-                return;
-            }
+        //    if (events == null)
+        //    {
+        //        await RespondAsync($"Something went wrong... contact <@{Program.AuthorID}>", ephemeral: true);
+        //        return;
+        //    }
 
-            if (events.Count == 0)
-            {
-                await RespondAsync("No Events");
-                return;
-            }
+        //    if (events.Count == 0)
+        //    {
+        //        await RespondAsync("No Events");
+        //        return;
+        //    }
 
-            string output = "";
+        //    string output = "";
 
-            foreach (Classes.Event e in events)
-            {
-                output += e.Name;
-            }
+        //    foreach (Classes.Event e in events)
+        //    {
+        //        output += e.Name;
+        //    }
 
-            await RespondAsync(output);
-        }
+        //    await RespondAsync(output);
+        //}
     }
 }
