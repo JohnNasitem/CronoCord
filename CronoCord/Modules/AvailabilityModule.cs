@@ -112,7 +112,7 @@ namespace CronoCord.Modules
                 else
                 {
                     // Generate edit availability message and send it to user
-                    EditScheduleMessageComponent menuStuff = new EditScheduleMessageComponent(userSchedule, 2, 0);
+                    EditScheduleMessageComponent menuStuff = new EditScheduleMessageComponent(userSchedule, 5, 0);
                     await RespondAsync(embed: menuStuff.Embed, components: menuStuff.MessageComponent, ephemeral: true);
                 }
              else
