@@ -50,7 +50,7 @@ namespace CronoCord.Modules
             catch (Exception ex)
             {
                 await RespondAsync($"Something went wrong... contact <@{Program.AuthorID}>", ephemeral: true);
-                Console.WriteLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}]: Problem occured in AddAvailabilitySlotCommand(). Exception: {ex}");
+                UtilityMethods.PrettyConsoleWriteLine($"Problem occured in AddAvailabilitySlotCommand(). Exception: {ex}", UtilityMethods.LogLevel.Error);
             }
         }
 
@@ -69,27 +69,35 @@ namespace CronoCord.Modules
             [Summary("week_offset", "The week offset for the schedule (positive only)")] int weekOffset = 0,
             [Summary("show_overlap-Count", "Whether to show the count of overlapping events")] bool showOverlapCount = false)
         {
-            // List of users
-            List<IUser> users = new List<IUser>();
-
-            // Find all users from the usersStr
-            foreach (Match match in Regex.Matches(usersStr, @"\d+"))
+            try
             {
-                IUser possibleUser = Context.Client.GetUserAsync(ulong.Parse(match.Value)).Result;
+                // List of users
+                List<IUser> users = new List<IUser>();
 
-                if (possibleUser != null)
-                    users.Add(possibleUser);
+                // Find all users from the usersStr
+                foreach (Match match in Regex.Matches(usersStr, @"\d+"))
+                {
+                    IUser possibleUser = Context.Client.GetUserAsync(ulong.Parse(match.Value)).Result;
+
+                    if (possibleUser != null)
+                        users.Add(possibleUser);
+                }
+
+                // Default to invoking user
+                if (usersStr == "")
+                    users.Add(Context.User);
+
+                // Only positive week offsets
+                if (weekOffset < 0)
+                    weekOffset = 0;
+
+                await ViewSchedule(users, weekOffset, showOverlapCount);
             }
-
-            // Default to invoking user
-            if (usersStr == "")
-                users.Add(Context.User);
-
-            // Only positive week offsets
-            if (weekOffset < 0)
-                weekOffset = 0;
-
-            await ViewSchedule(users, weekOffset, showOverlapCount);
+            catch (Exception ex)
+            {
+                await RespondAsync($"Something went wrong... contact <@{Program.AuthorID}>", ephemeral: true);
+                UtilityMethods.PrettyConsoleWriteLine($"Problem occured in ViewScheduleCommand(). Exception: {ex}", UtilityMethods.LogLevel.Error);
+            }
         }
 
 
@@ -101,12 +109,13 @@ namespace CronoCord.Modules
         [SlashCommand("edit-schedule", "Edit your schedule availabilities")]
         public async Task EditScheduleCommand()
         {
-            List<Availability> userSchedule = null;
+            try
+            {
+                List<Availability> userSchedule = null;
 
-            // Get availabilities
-            await Task.Run(() => userSchedule = DatabaseManagement.GetAvailabilites(new List<ulong>() { Context.User.Id }));
+                // Get availabilities
+                await Task.Run(() => userSchedule = DatabaseManagement.GetAvailabilites(new List<ulong>() { Context.User.Id }));
 
-            if (userSchedule != null)
                 if (userSchedule.Count == 0)
                     await RespondAsync($"No availabilities to edit! Use the /add-availability-slot to add one", ephemeral: true);
                 else
@@ -115,8 +124,12 @@ namespace CronoCord.Modules
                     EditScheduleMessageComponent menuStuff = new EditScheduleMessageComponent(userSchedule, 5, 0);
                     await RespondAsync(embed: menuStuff.Embed, components: menuStuff.MessageComponent, ephemeral: true);
                 }
-             else
-                    await RespondAsync($"Something went wrong... contact <@{Program.AuthorID}>", ephemeral: true);
+            }
+            catch (Exception ex)
+            {
+                await RespondAsync($"Something went wrong... contact <@{Program.AuthorID}>", ephemeral: true);
+                UtilityMethods.PrettyConsoleWriteLine($"Problem occured in ViewScheduleCommand(). Exception: {ex}", UtilityMethods.LogLevel.Error);
+            }
         }
 
 
@@ -139,7 +152,7 @@ namespace CronoCord.Modules
             // Null means something went wrong with accessing the database
             if (unfiltered_availabilities == null)
             {
-                Console.WriteLine("Method: ViewSchedule - Problem: unfiltered_availabilities was null, something happened with getting availabilities");
+                UtilityMethods.PrettyConsoleWriteLine($"Method: ViewSchedule - Problem: unfiltered_availabilities was null, something happened with getting availabilities for this users: {string.Join(", ", users.Select(u => u.Id))}", UtilityMethods.LogLevel.Error);
                 await RespondAsync($"Something went wrong... contact <@{Program.AuthorID}>", ephemeral: true);
                 return;
             }
@@ -364,7 +377,14 @@ namespace CronoCord.Modules
                         }
                     }
                 }
-                bm.Save("schedule.png", System.Drawing.Imaging.ImageFormat.Png);
+                try
+                {
+                    bm.Save("schedule.png", System.Drawing.Imaging.ImageFormat.Png);
+                }
+                catch (Exception ex)
+                {
+                    UtilityMethods.PrettyConsoleWriteLine($"Method: GenerateScheduleImage() - Problem: Couldn't save the generated image - {ex}", UtilityMethods.LogLevel.Error);
+                }
             }
         }
 

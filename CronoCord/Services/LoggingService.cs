@@ -28,16 +28,13 @@ namespace CronoCord.Services
         {
             if (message.Exception is CommandException cmdException)
             {
-                Console.WriteLine($"[Command/{message.Severity}] {cmdException.Command.Aliases.First()}"
-                    + $" failed to execute in {cmdException.Context.Channel}.");
-                Console.WriteLine(cmdException);
+                UtilityMethods.PrettyConsoleWriteLine($"[Command/{message.Severity}] {cmdException.Command.Aliases.First()} failed to execute in {cmdException.Context.Channel}.", UtilityMethods.LogLevel.Error);
+                UtilityMethods.PrettyConsoleWriteLine(cmdException.ToString(), UtilityMethods.LogLevel.Error);
             }
             else if (message.Exception is InteractionException intException)
-            {
-                Console.WriteLine($"[Interaction/{message.Severity}] {message}");
-            }
+                UtilityMethods.PrettyConsoleWriteLine($"[Interaction/{message.Severity}] {message}", UtilityMethods.LogLevel.Info);
             else
-                Console.WriteLine($"[General/{message.Severity}] {message}");
+                UtilityMethods.PrettyConsoleWriteLine($"[General/{message.Severity}] {message}", UtilityMethods.LogLevel.Info);
 
             return Task.CompletedTask;
         }

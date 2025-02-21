@@ -146,7 +146,7 @@ namespace CronoCord.Utilities
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Problem with connecting to the database: {ex.Message}");
+                UtilityMethods.PrettyConsoleWriteLine($"Problem with connecting to the database: {ex.Message}", UtilityMethods.LogLevel.Critical);
             }
         }
 
@@ -168,7 +168,7 @@ namespace CronoCord.Utilities
                         command.CommandText = "DROP TABLE IF EXISTS events";
                         command.ExecuteNonQuery();
                     }
-                    Console.WriteLine("Dropped events table");
+                    UtilityMethods.PrettyConsoleWriteLine("Dropped events table", UtilityMethods.LogLevel.Info);
 
                     // Create table
                     using (SQLiteCommand command = _connection.CreateCommand())
@@ -188,7 +188,7 @@ namespace CronoCord.Utilities
                                                 )";
                         command.ExecuteNonQuery();
                     }
-                    Console.WriteLine("Created events table");
+                    UtilityMethods.PrettyConsoleWriteLine("Created events table", UtilityMethods.LogLevel.Info);
                 }
 
 
@@ -200,7 +200,7 @@ namespace CronoCord.Utilities
                         command.CommandText = "DROP TABLE IF EXISTS availabilities";
                         command.ExecuteNonQuery();
                     }
-                    Console.WriteLine("Dropped availabilities table");
+                    UtilityMethods.PrettyConsoleWriteLine("Dropped availabilities table", UtilityMethods.LogLevel.Info);
 
                     // Create table
                     using (SQLiteCommand command = _connection.CreateCommand())
@@ -214,18 +214,18 @@ namespace CronoCord.Utilities
                                                 )";
                         command.ExecuteNonQuery();
                     }
-                    Console.WriteLine("Created availabilities table");
+                    UtilityMethods.PrettyConsoleWriteLine("Created availabilities table", UtilityMethods.LogLevel.Info);
                 }
 
                 return true;
             }
             catch (SQLiteException ex)
             {
-                Console.WriteLine($"SQLite Exception - Error Code: {(_sqliteResultCodes.ContainsKey(ex.ErrorCode) ? _sqliteResultCodes[ex.ErrorCode] : "N/A")} - Error: {ex.Message}");
+                LogSQLiteException(ex);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Problem occured in DatabaseManagement.ResetTable: {ex.Message}");
+                UtilityMethods.PrettyConsoleWriteLine($"Problem occured in DatabaseManagement.ResetTable: {ex.Message}", UtilityMethods.LogLevel.Error);
             }
 
             return false;
@@ -263,11 +263,11 @@ namespace CronoCord.Utilities
             }
             catch (SQLiteException ex)
             {
-                Console.WriteLine($"SQLite Exception - Error Code: {(_sqliteResultCodes.ContainsKey(ex.ErrorCode) ? _sqliteResultCodes[ex.ErrorCode] : "N/A")} - Error: {ex.Message}");
+                LogSQLiteException(ex);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Problem occured in DatabaseManagement.CreateAvailability: {ex.Message}");
+                UtilityMethods.PrettyConsoleWriteLine($"Problem occured in DatabaseManagement.CreateAvailability: {ex.Message}", UtilityMethods.LogLevel.Error);
             }
 
             return false;
@@ -312,17 +312,18 @@ namespace CronoCord.Utilities
             }
             catch (SQLiteException ex)
             {
-                Console.WriteLine($"SQLite Exception - Error Code: {(_sqliteResultCodes.ContainsKey(ex.ErrorCode) ? _sqliteResultCodes[ex.ErrorCode] : "N/A")} - Error: {ex.Message}");
+                LogSQLiteException(ex);
                 return null;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Problem occured in DatabaseManagement.GetAvailabilites: {ex.Message}");
+                UtilityMethods.PrettyConsoleWriteLine($"Problem occured in DatabaseManagement.GetAvailabilites: {ex.Message}", UtilityMethods.LogLevel.Error);
                 return null;
             }
 
             return availabilities;
         }
+
 
 
         /// <summary>
@@ -360,11 +361,11 @@ namespace CronoCord.Utilities
             }
             catch (SQLiteException ex)
             {
-                Console.WriteLine($"SQLite Exception - Error Code: {(_sqliteResultCodes.ContainsKey(ex.ErrorCode) ? _sqliteResultCodes[ex.ErrorCode] : "N/A")} - Error: {ex.Message}");
+                LogSQLiteException(ex);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Problem occured in DatabaseManagement.EditAvailability: {ex.Message}");
+                UtilityMethods.PrettyConsoleWriteLine($"Problem occured in DatabaseManagement.EditAvailability: {ex.Message}", UtilityMethods.LogLevel.Error);
             }
 
             return false;
@@ -401,11 +402,11 @@ namespace CronoCord.Utilities
             }
             catch (SQLiteException ex)
             {
-                Console.WriteLine($"SQLite Exception - Error Code: {(_sqliteResultCodes.ContainsKey(ex.ErrorCode) ? _sqliteResultCodes[ex.ErrorCode] : "N/A")} - Error: {ex.Message}");
+                LogSQLiteException(ex);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Problem occured in DatabaseManagement.DeleteAvailability: {ex.Message}");
+                UtilityMethods.PrettyConsoleWriteLine($"Problem occured in DatabaseManagement.DeleteAvailability: {ex.Message}", UtilityMethods.LogLevel.Error);
             }
 
             return false;
@@ -448,11 +449,11 @@ namespace CronoCord.Utilities
             }
             catch (SQLiteException ex)
             {
-                Console.WriteLine($"SQLite Exception - Error Code: {(_sqliteResultCodes.ContainsKey(ex.ErrorCode) ? _sqliteResultCodes[ex.ErrorCode] : "N/A")} - Error: {ex.Message}");
+                LogSQLiteException(ex);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Problem occured in DatabaseManagement.CreateEvent: {ex.Message}");
+                UtilityMethods.PrettyConsoleWriteLine($"Problem occured in DatabaseManagement.CreateEvent: {ex.Message}", UtilityMethods.LogLevel.Error);
             }
 
             return false;
@@ -497,18 +498,30 @@ namespace CronoCord.Utilities
             }
             catch (SQLiteException ex)
             {
-                Console.WriteLine($"SQLite Exception - Error Code: {(_sqliteResultCodes.ContainsKey(ex.ErrorCode) ? _sqliteResultCodes[ex.ErrorCode] : "N/A")} - Error: {ex.Message}");
+                LogSQLiteException(ex);
                 return null;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Problem occured in DatabaseManagement.GetEvents: {ex.Message}");
+                UtilityMethods.PrettyConsoleWriteLine($"Problem occured in DatabaseManagement.GetEvents: {ex.Message}", UtilityMethods.LogLevel.Error);
                 return null;
             }
 
             return events;
         }
         #endregion
+
+
+
+
+        /// <summary>
+        /// Log SQLiteExceptions
+        /// </summary>
+        /// <param name="ex">exception</param>
+        private static void LogSQLiteException(SQLiteException ex)
+        {
+            UtilityMethods.PrettyConsoleWriteLine($"SQLite Exception - Error Code: {(_sqliteResultCodes.ContainsKey(ex.ErrorCode) ? _sqliteResultCodes[ex.ErrorCode] : "N/A")} - Error: {ex.Message}", UtilityMethods.LogLevel.Error);
+        }
 
 
 
