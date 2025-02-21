@@ -17,6 +17,7 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Threading.Tasks;
 using CronoCord.Classes;
+using CronoCord.Interactions.MessageComponents;
 
 namespace CronoCord
 {
@@ -41,6 +42,7 @@ namespace CronoCord
             _client.ModalSubmitted += ModalSubmitted;
             // Process select selections
             _client.SelectMenuExecuted += SelectExecuted;
+            _client.ButtonExecuted += ButtonExecute;
             // Add the public modules that inherit InteractionModuleBase<T> to the InteractionService
             await _handler.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
             // Process the InteractionCreated payloads to execute Interactions commands
@@ -49,6 +51,15 @@ namespace CronoCord
             _handler.InteractionExecuted += HandleInteractionExecute;
         }
 
+        private async Task ButtonExecute(SocketMessageComponent arg)
+        {
+            switch (arg.Data.CustomId.Split(':')[0])
+            {
+                case "edit-schedule-button": 
+                    await EditScheduleMessageComponent.ButtonPressed(arg);
+                    break;
+            }
+        }
 
         private async Task SelectExecuted(SocketMessageComponent arg)
         {
@@ -67,13 +78,13 @@ namespace CronoCord
             switch (modal.Data.CustomId.Split(':')[0])
             {
                 case "create_event":
-                    await Interactions.Modals.CreateEventModal.ModelSubmit(modal);
+                    await CreateEventModal.ModelSubmit(modal);
                     break;
                 case "create_availability":
-                    await Interactions.Modals.CreateAvailabilityModal.ModelSubmit(modal);
+                    await CreateAvailabilityModal.ModelSubmit(modal);
                     break;
                 case "edit_availability":
-                    await Interactions.Modals.EditAvailabilityModal.ModelSubmit(modal);
+                    await EditAvailabilityModal.ModelSubmit(modal);
                     break;
             }
         }
