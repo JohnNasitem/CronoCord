@@ -1,4 +1,0 @@
-// In ModalSubmitted
-case "create_event":
-    await CreateEventModal.ModelSubmit(modal);
-    break;
