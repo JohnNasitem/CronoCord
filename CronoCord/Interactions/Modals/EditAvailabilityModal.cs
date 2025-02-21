@@ -27,7 +27,7 @@ namespace CronoCord.Interactions.Modals
             // Prepopulate fields with old data
             Title = "Edit Availability Slot";
             CustomId = $"edit_availability:{availabilityToEdit.StartTimeUnix},{availabilityToEdit.EndTimeUnix},{Enum.GetName(typeof(Availability.Recurring), availabilityToEdit.IsRecurring)}";
-            AddTextInput(label: "Date (MMM DD YYYY):",
+            AddTextInput(label: "Date (MMM DD YYYY) or (MM/DD/YYYY):",
                          customId: "availability_date",
                          style: TextInputStyle.Short,
                          required: true,
@@ -75,7 +75,7 @@ namespace CronoCord.Interactions.Modals
 
             // Find any errors in the input
             if (date == null)
-                errorMessage += $"Date: \"{dateStr}\" is in the wrong format! Use MMM DD YYYY\n";
+                errorMessage += $"Date: \"{dateStr}\" is in the wrong format! Use MMM DD YYYY (eg Feb 21 2025) or MM/DD/YYYY (2/21/2025)\n";
             if (startTime == null)
                 errorMessage += $"Start time: \"{startTimeStr}\" is in the wrong format! Use 12 hour format\n";
             if (endTime == null)

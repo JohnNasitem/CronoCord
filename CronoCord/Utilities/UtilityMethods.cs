@@ -40,6 +40,19 @@ namespace CronoCord
 
 
         /// <summary>
+        /// Matches date<br/>
+        /// eg 02/02/2222, 2/2/2222<br/>
+        /// Group 1: Month<br/>
+        /// Group 2: Day of the month<br/>
+        /// Group 3: Year<br/>
+        /// Usage $"(?i)^{<see cref="FormalDateRegexString"/>}$"
+        /// Note: numbers still need to be validated
+        /// </summary>
+        public static string FormalDateRegexString { get; } = @"(\d{1,2})\/(\d{1,2})\/(\d{4})";
+
+
+
+        /// <summary>
         /// List of abbreviated months
         /// </summary>
         public static List<string> AbbreviatedMonths = new List<string> { "jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec" };
@@ -53,25 +66,39 @@ namespace CronoCord
         /// <returns>DateTime if parse was successful, null if not</returns>
         public static DateTime? ParseDateTime(string input)
         {
-            // Group 1: Full Date
+            // Group 1: Full Date | Full Formal Date
             // Group 2: Month
             // Group 3: Day of the month
             // Group 4: Year
-            // Group 5: Full Time of day
-            // Group 6: Hour
-            // Group 7: NOT USED
-            // Group 8: Minutes
-            // Group 9: am/pm
-            Match dateTimeMatch = Regex.Match(input, $@"(?i)^({DateRegexString})?\s?({TimeOfDayRegexString})?$");
+            // Group 5: Formal Month
+            // Group 6: Formal Day of the month
+            // Group 7: Formal Year
+            // Group 8: Full Time of day
+            // Group 9: Hour
+            // Group 10: NOT USED
+            // Group 11: Minutes
+            // Group 12: am/pm
+            Match dateTimeMatch = Regex.Match(input, $@"(?i)^({DateRegexString}|{FormalDateRegexString})?\s?({TimeOfDayRegexString})?$");
 
             // Return null if invalid date was inputted
             if (!dateTimeMatch.Success)
                 return null;
 
             //Parse data
-            string yearString = dateTimeMatch.Groups[4].ToString();
-            string monthString = dateTimeMatch.Groups[2].ToString().ToLower();
-            string domString = dateTimeMatch.Groups[3].ToString();
+            string yearString = "", monthString = "", domString = "";
+
+            if (dateTimeMatch.Groups[2].Value.Length > 0)
+            {
+                yearString = dateTimeMatch.Groups[4].ToString();
+                monthString = dateTimeMatch.Groups[2].ToString().ToLower();
+                domString = dateTimeMatch.Groups[3].ToString();
+            }
+            else if (dateTimeMatch.Groups[5].Value.Length > 0)
+            {
+                yearString = dateTimeMatch.Groups[7].ToString();
+                monthString = dateTimeMatch.Groups[5].ToString().ToLower();
+                domString = dateTimeMatch.Groups[6].ToString();
+            }
             int year = 1;
             int month = 1;
             int dayOfMonth = 1;
@@ -79,22 +106,25 @@ namespace CronoCord
             // only set year, month, and dayOfMonth if all 3 were matched
             if (yearString.Length > 0 && monthString.Length > 0 && domString.Length > 0)
             {
-                // Return null if month doesnt exist
-                if (!AbbreviatedMonths.Contains(dateTimeMatch.Groups[2].ToString().ToLower()))
-                    return null;
-
                 int.TryParse(yearString, out year);
-                month = AbbreviatedMonths.IndexOf(monthString) + 1;
+                //Use either number or bbreviated name
+                if (!int.TryParse(monthString, out month))
+                {
+                    // Return null if month doesnt exist
+                    if (!AbbreviatedMonths.Contains(monthString))
+                        return null;
+                    month = AbbreviatedMonths.IndexOf(monthString) + 1;
+                }
                 int.TryParse(domString, out dayOfMonth);
             }
 
             // Dont need to check if time was matched as 0 is in the range for all 3
-            int.TryParse(dateTimeMatch.Groups[6].ToString(), out int hours);
-            int.TryParse(dateTimeMatch.Groups[8].ToString(), out int minutes);
-            string meridiem = dateTimeMatch.Groups[9].ToString().ToLower();
+            int.TryParse(dateTimeMatch.Groups[9].ToString(), out int hours);
+            int.TryParse(dateTimeMatch.Groups[11].ToString(), out int minutes);
+            string meridiem = dateTimeMatch.Groups[12].ToString().ToLower();
 
-            // Enforce 12 hour format
-            if (hours > 12)
+            // Enforce 12 hour format and 12 months
+            if (hours > 12 || month > 12 || month < 1)
                 return null;
 
             // Make 12 act as 0
