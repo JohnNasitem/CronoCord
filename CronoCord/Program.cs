@@ -7,11 +7,8 @@
 
 // Program icon based off https://www.vecteezy.com/vector-art/6892625-discord-logo-icon-editorial-vector
 
-using System;
-using System.Threading.Tasks;
 using Discord.WebSocket;
 using Discord;
-using System.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using CronoCord.Services;
 using Discord.Commands;
