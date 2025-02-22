@@ -5,7 +5,7 @@
 //Author: John Nasitem
 //***********************************************************************************
 
-
+// Program icon based off https://www.vecteezy.com/vector-art/6892625-discord-logo-icon-editorial-vector
 
 using System;
 using System.Threading.Tasks;
