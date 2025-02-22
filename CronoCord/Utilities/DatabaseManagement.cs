@@ -385,10 +385,11 @@ namespace CronoCord.Utilities
                 using (var command = _connection.CreateCommand())
                 {
                     command.CommandText = "DELETE FROM availabilities " +
-                                          $"WHERE EndTimeUnix < @EndTimeUnix AND Recurring = {Enum.GetName(typeof(Availability.Recurring), Availability.Recurring.N)}";
+                                          $"WHERE EndTimeUnix < @EndTimeUnix AND Recurring = @Recurring";
 
                     // Add parameters
                     command.Parameters.AddWithValue("@EndTimeUnix", unixThreshold);
+                    command.Parameters.AddWithValue("@Recurring", Enum.GetName(typeof(Availability.Recurring), Availability.Recurring.N));
 
                     // Execute the query
                     int rowsAffected = command.ExecuteNonQuery();
