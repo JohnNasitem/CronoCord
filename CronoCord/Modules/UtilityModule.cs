@@ -88,6 +88,9 @@ namespace CronoCord.Modules
                          .AddField("Recurring", "Does the availability repeat. All that matters is the first letter. (N)ever, (D)aily, (W)eekly, (M)onthly, (Y)early", false)
                          .AddField("Delete Slot", "Should the slot be deleted. If the input for this field starts with a \"Y\" then it will delete the availability", false);
                     break;
+                case SlashCommands.ResetDatabase:
+                    embed.WithDescription("You don't have access to this command. Dont worry about it");
+                    break;
                 default:
                     embed.WithDescription("Command doesnt have a description yet. Tell <@{Program.AuthorID}> to make one.");
                     break;
@@ -107,7 +110,10 @@ namespace CronoCord.Modules
             // Availability
             AddAvailabilitySlot,
             ViewSchedule,
-            EditSchedule
+            EditSchedule,
+
+            // Database
+            ResetDatabase
         }
     }
 }
