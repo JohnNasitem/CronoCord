@@ -290,7 +290,7 @@ namespace CronoCord.Utilities
         /// </summary>
         /// <param name="oldAvailabiltiy">entry to replace</param>
         /// <param name="newAvailability">new details to use</param>
-        /// <returns>sucess</returns>
+        /// <returns>how many have been editted</returns>
         public static int EditAvailability(Availability oldAvailabiltiy, Availability newAvailability)
         {
             try
@@ -336,7 +336,7 @@ namespace CronoCord.Utilities
         /// Deletes an entry from the availability table
         /// </summary>
         /// <param name="availabilityToDelete">entry to delete</param>
-        /// <returns>success</returns>
+        /// <returns>how many have been deleted</returns>
         public static int DeleteAvailability(Availability availabilityToDelete)
         {
             try
@@ -365,6 +365,44 @@ namespace CronoCord.Utilities
             catch (Exception ex)
             {
                 UtilityMethods.PrettyConsoleWriteLine($"Problem occured in DatabaseManagement.DeleteAvailability: {ex.Message}", UtilityMethods.LogLevel.Error);
+            }
+
+            return -1;
+        }
+
+
+
+
+        /// <summary>
+        /// Deletes all entries that dont repeat and are before the unixThreshold
+        /// </summary>
+        /// <param name="unixThreshold">any endtimes before this threshold will be deleted</param>
+        /// <returns>how many have been deleted</returns>
+        public static int CleanUpAvailabilities(long unixThreshold)
+        {
+            try
+            {
+                using (var command = _connection.CreateCommand())
+                {
+                    command.CommandText = "DELETE FROM availabilities " +
+                                          $"WHERE EndTimeUnix < @EndTimeUnix AND Recurring = {Enum.GetName(typeof(Availability.Recurring), Availability.Recurring.N)}";
+
+                    // Add parameters
+                    command.Parameters.AddWithValue("@EndTimeUnix", unixThreshold);
+
+                    // Execute the query
+                    int rowsAffected = command.ExecuteNonQuery();
+
+                    return rowsAffected;
+                }
+            }
+            catch (SQLiteException ex)
+            {
+                LogSQLiteException(ex);
+            }
+            catch (Exception ex)
+            {
+                UtilityMethods.PrettyConsoleWriteLine($"Problem occured in DatabaseManagement.CleanUpAvailabilities: {ex.Message}", UtilityMethods.LogLevel.Error);
             }
 
             return -1;
