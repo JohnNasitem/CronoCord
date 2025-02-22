@@ -150,6 +150,9 @@ namespace CronoCord.Modules
         {
             List<Availability> unfiltered_availabilities = null;
             List<Availability> filtered_availabilities = new List<Availability>();
+
+            // Make sure all users a unique
+            users = users.Distinct().ToList();
             
             // Get availabilities
             await Task.Run(() => unfiltered_availabilities = DatabaseManagement.GetAvailabilites(users.Select(u => u.Id).ToList()));
@@ -397,7 +400,7 @@ namespace CronoCord.Modules
                     byte b = (byte)_rand.Next(180, 256);
                     // Avoid colors with too similar RGB values (to skip gray-like tones)
                     // Avoid brownish hues by ensuring no dominant mix of red and green
-                    if (Math.Abs(r - g) > 30 || Math.Abs(r - b) > 30 || Math.Abs(g - b) > 30 && !(r > 200 && 210 < g && g > 150 && b < 100))
+                    if (Math.Abs(r - g) > 60 || Math.Abs(r - b) > 60 || Math.Abs(g - b) > 60 && !(r > 200 && 210 < g && g > 150 && b < 100))
                         return new SKPaint
                         {
                             Color = new SKColor(r, g, b, 128),
