@@ -205,16 +205,13 @@ namespace CronoCord.Modules
                             break;
 
                         case Availability.Recurring.W:
-                            // Dont add a new availability if the original is still in selected week's range
-                            if (availability.StartTimeUnix < startSundayUnix)
-                            {
-                                int daysFromSunday = (int)((availability.StartTimeUnix + 4 * 86_400) % 604_800 / 86_400);
-                                filtered_availabilities.Add(new Availability(availability.UserID,
-                                                                             // For both start and end time add the day and time offset to the selected week's sunday
-                                                                             startSundayUnix + (daysFromSunday * 86_400) + (int)UtilityMethods.ToDateTime(availability.StartTimeUnix).TimeOfDay.TotalSeconds,
-                                                                             startSundayUnix + (daysFromSunday * 86_400) + (int)UtilityMethods.ToDateTime(availability.EndTimeUnix).TimeOfDay.TotalSeconds,
-                                                                             Availability.Recurring.N));
-                            }
+                            // Get the startTimeunix and endTimeUnix for this week
+                            long offsetStartUnixW = new DateTimeOffset(UtilityMethods.ToDateTime(availability.StartTimeUnix).AddDays(7 * weekOffset)).ToUnixTimeSeconds();
+                            long offsetEndUnixW = new DateTimeOffset(UtilityMethods.ToDateTime(availability.EndTimeUnix).AddDays(7 * weekOffset)).ToUnixTimeSeconds();
+
+                            // Add slot if it is within the selected week's range
+                            if (startSundayUnix <= offsetStartUnixW && offsetStartUnixW <= endSaturdayUnix)
+                                filtered_availabilities.Add(new Availability(availability.UserID, offsetStartUnixW, offsetEndUnixW, Availability.Recurring.N));
                             break;
                         case Availability.Recurring.M:
                             DateTime originalDateM = UtilityMethods.ToDateTime(availability.StartTimeUnix);
