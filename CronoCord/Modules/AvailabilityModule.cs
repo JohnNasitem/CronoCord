@@ -362,7 +362,7 @@ namespace CronoCord.Modules
                         canvas.DrawRect(new SKRect(backgroundWidth, i * 50, backgroundWidth + 400, 50 + (i * 50)), userColours[user.Id]);
 
                         // Add display name
-                        canvas.DrawText(user.GlobalName, new SKPoint(backgroundWidth + 200, 35 + (i * 50)), SKTextAlign.Center, ROWHEADERFONT, textPaint);
+                        canvas.DrawText(user.GlobalName ?? user.Username, new SKPoint(backgroundWidth + 200, 35 + (i * 50)), SKTextAlign.Center, ROWHEADERFONT, textPaint);
                     }
                 }
                 try
