@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CronoCord")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2ebc1ad514cd80052d158b76eb7bc9e197b78175")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+90b5718ca9272ccc9fc948a1926733e208c8471d")]
 [assembly: System.Reflection.AssemblyProductAttribute("CronoCord")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CronoCord")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
