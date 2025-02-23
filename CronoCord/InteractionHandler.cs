@@ -123,8 +123,11 @@ namespace CronoCord
                             // This can be due to user permissions, missing arguments, or other conditions
                             await interaction.RespondAsync("You do not meet the preconditions to run this command.");
                             break;
+                        case InteractionCommandError.UnknownCommand:
+                            // Happens when the uses submits a modal, code this runs fine but just putting this here so error doesnt get logged
+                            break;
                         default:
-                            Console.WriteLine("HandleInteraction -1");
+                            UtilityMethods.PrettyConsoleWriteLine($"Unknown problem occured in during an interaction create: Error: {result.Error} - {result.ErrorReason}.", UtilityMethods.LogLevel.Error);
                             break;
                     }
             }
@@ -149,6 +152,9 @@ namespace CronoCord
                         break;
                     case InteractionCommandError.Exception:
                         UtilityMethods.PrettyConsoleWriteLine($"Exception occured in {commandInfo.Name}. Exception: {result.ErrorReason}", UtilityMethods.LogLevel.Error);
+                        break;
+                    case InteractionCommandError.UnknownCommand:
+                        // Happens when the uses submits a modal, code this runs fine but just putting this here so error doesnt get logged
                         break;
                     default:
                         UtilityMethods.PrettyConsoleWriteLine($"Unknown problem occured in during an interaction execute: Error: {result.Error} - {result.ErrorReason}.", UtilityMethods.LogLevel.Error);
