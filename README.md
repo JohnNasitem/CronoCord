@@ -10,7 +10,7 @@ Discord bot for managing schedules
 
 ## Setup
 Before starting the bot, make sure to go to system environment variables, and add a new user variable with the name CRONOCORD_BOT_TOKEN and value is your bot token.
-Also make sure to sync your computers clock
+Also make sure to sync your computers clock.
 Steps on windows:
 1. open cmd in admin mode
 2. make sure windows time service is running with this command: net start w32time
